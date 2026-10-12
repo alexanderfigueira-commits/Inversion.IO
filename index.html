@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feel2Zen | Estética e Massagens</title>
+<meta name="description" content="Feel2Zen: massagens, reflexologia, manicure, pedicure, depilação, pestanas e tratamentos de estética. Marque a sua consulta online.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf8f5; --card:#ffffff; --ink:#2b2833; --muted:#6b6676;
+    --accent:#8a5fa8; --accent-dark:#6f4a8b; --sage:#7d9a86; --line:#e9e4ee; --soft:#f1eaf6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#17151b; --card:#201d26; --ink:#f1edf5; --muted:#aaa3b5; --accent:#b68ad4; --accent-dark:#c9a3e4; --sage:#9bb8a3; --line:#332f3b; --soft:#2a2433; }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+  h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.15;margin:0}
+  a{color:inherit}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+  header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:600;text-decoration:none;color:var(--accent-dark)}
+  .logo span{color:var(--sage)}
+  nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0}
+  nav ul a{text-decoration:none;color:var(--muted);font-size:.95rem}
+  nav ul a:hover{color:var(--accent)}
+  .btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:12px 24px;border-radius:999px;font-weight:600;font-size:.95rem;transition:background .2s,transform .2s}
+  .btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--accent-dark);border:1.5px solid var(--accent)}
+  .btn.ghost:hover{background:var(--soft)}
+  .hero{padding:84px 0 72px;text-align:center;background:radial-gradient(900px 380px at 50% 0,var(--soft),transparent)}
+  .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);margin-bottom:16px}
+  .hero p{max-width:560px;margin:0 auto 28px;color:var(--muted);font-size:1.1rem}
+  .hero .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  section{padding:64px 0}
+  .head{text-align:center;margin-bottom:36px}
+  .head h2{font-size:clamp(2rem,4.5vw,2.8rem);margin-bottom:8px}
+  .head p{color:var(--muted);margin:0}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}
+  .card h3{font-size:1.45rem;margin-bottom:6px;color:var(--accent-dark)}
+  .card p{margin:0;color:var(--muted);font-size:.95rem}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+  .tabs button{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+  .tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px 24px}
+  .item{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .item:last-child{border-bottom:0}
+  .item small{display:block;color:var(--muted);font-size:.85rem;line-height:1.4;margin-top:2px}
+  .price{white-space:nowrap;font-weight:600;color:var(--accent-dark)}
+  .price.ask{font-weight:400;color:var(--muted)}
+  .note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:14px}
+  .about{background:var(--soft)}
+  .about .wrap{max-width:720px;text-align:center}
+  .about p{color:var(--muted);font-size:1.05rem}
+  .contact-box{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .contact-box .card h3{font-size:1.3rem}
+  footer{padding:32px 0;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.9rem}
+  @media (max-width:720px){ nav ul{display:none} .hero{padding:56px 0 48px} .list{padding:4px 16px} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <a class="logo" href="#top">Feel<span>2</span>Zen</a>
+      <ul>
+        <li><a href="#categorias">Tratamentos</a></li>
+        <li><a href="#precos">Preços</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener">Marcar</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <h1>Um momento só para si</h1>
+      <p>Massagens, reflexologia, unhas, depilação e estética. Pare um pouco, respire e deixe-nos cuidar de si.</p>
+      <div class="actions">
+        <a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener">Marcar online</a>
+        <a class="btn ghost" href="#precos">Ver preços</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="categorias">
+    <div class="wrap">
+      <div class="head"><h2>O que fazemos</h2><p>Tratamentos pensados para relaxar e para cuidar.</p></div>
+      <div class="cards">
+        <div class="card"><h3>Massagens</h3><p>Relax, terapêutica, drenagem linfática, anti celulite, havaiana, bambu, hot oil e rituais.</p></div>
+        <div class="card"><h3>Reflexologia</h3><p>Estimulação de pontos nos pés e nas mãos para aliviar tensão e recuperar energia.</p></div>
+        <div class="card"><h3>Mãos e pés</h3><p>Manicure, pedicure, gelinho, gel, acrílico e tratamentos com parafina.</p></div>
+        <div class="card"><h3>Depilação</h3><p>Cera e threading para rosto e corpo, em zonas individuais ou em pack.</p></div>
+        <div class="card"><h3>Pestanas</h3><p>Extensões, manutenção e lifting para um olhar mais marcado.</p></div>
+        <div class="card"><h3>Rosto e corpo</h3><p>Limpeza de pele, mini facial, esfoliação corporal, cavitação e radiofrequência.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="precos" style="background:var(--soft)">
+    <div class="wrap">
+      <div class="head"><h2>Serviços e preços</h2><p>Escolha uma categoria.</p></div>
+      <div class="tabs" id="tabs" role="group" aria-label="Categorias"></div>
+      <div class="list" id="list" aria-live="polite"></div>
+      <p class="note">Os valores podem mudar. Confirme sempre no momento da marcação.</p>
+      <p style="text-align:center;margin-top:24px"><a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener">Marcar agora</a></p>
+    </div>
+  </section>
+
+  <section id="sobre" class="about">
+    <div class="wrap">
+      <div class="head"><h2>Sobre a Feel2Zen</h2></div>
+      <p>A Feel2Zen é um espaço de bem estar onde cada tratamento é feito com calma e atenção. Do cuidado das unhas a uma massagem de corpo inteiro, o objetivo é o mesmo: que saia daqui mais leve do que entrou.</p>
+    </div>
+  </section>
+
+  <section id="contacto">
+    <div class="wrap">
+      <div class="head"><h2>Contacto</h2><p>A forma mais rápida de marcar é online.</p></div>
+      <div class="contact-box">
+        <div class="card"><h3>Marcações</h3><p><a href="https://buk.pt/feel2zen" target="_blank" rel="noopener">buk.pt/feel2zen</a></p></div>
+        <div class="card"><h3>Morada</h3><p>Adicionar morada</p></div>
+        <div class="card"><h3>Telefone e horário</h3><p>Adicionar telefone e horário</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">© <span id="y"></span> Feel2Zen</div></footer>
+
+<script>
+const ASK = null;
+const DATA = {
+  "Mãos e pés": [
+    ["Manicure normal",7.95],["Pedicure normal",16.8],["Pedicure normal + reflexologia",19.95],
+    ["Aplicação de gelinho",13.65],["Pedicure com gelinho",22.05],["Manicure com blindagem",14.7],
+    ["Aplicação de gel com extensão",26.25],["Aplicação de gel sem extensão",23.1],["Manutenção de gel",21],
+    ["Aplicação de acrílico 1ª vez",31.5],["Manutenção de acrílico",21],["Troca de cor de gel",13.65],
+    ["Remover gel / acrílico",10.75],["Pedicure com parafina",24.15],["Manicure com parafina",15.75],
+    ["Pintura normal de unhas",ASK],["Manicure com pindas / pedicure com vela",ASK]
+  ],
+  "Depilação": [
+    ["Pack depilação a cera",29.25],["Threading rosto",21],["Threading buço e sobrancelhas",21],
+    ["Threading sobrancelhas",7.35],["Threading buço",7.35],["Depilação a cera: perna inteira",ASK],
+    ["Depilação a cera: meia perna",ASK],["Depilação a cera: virilha",ASK],["Depilação a cera: axilas",ASK],
+    ["Depilação a cera: braços",ASK],["Depilação a cera: sobrancelhas",ASK],["Depilação a cera: buço",ASK]
+  ],
+  "Massagens": [
+    ["Massagem anti celulite (1 sessão)",31.5],["Drenagem linfática manual (método Vodder, 1 sessão)",31.5],
+    ["Massagem terapêutica (60 min)",27.3],["Massagem terapêutica (corpo inteiro)",47.25],
+    ["Massagem Feel2Zen Relax (corpo inteiro)",36.9],["Massagem de costas (tabida, 1 sessão)",25.2],
+    ["Massagem havaiana (corpo inteiro)",ASK],["Massagem Bambu Relax (corpo inteiro)",36.75],
+    ["Massagem rock relax (corpo inteiro)",ASK],["Massagem Hot oil (corpo inteiro)",ASK],
+    ["Massagem Chapai Feel2Zen (cabeça)",ASK],["Massagem com velas",ASK],["Massagem para 2 pessoas",ASK],
+    ["Ritual egípcio (esfoliação corporal + massagem + chá)",ASK]
+  ],
+  "Reflexologia": [
+    ["Reflexologia Feel2Zen mãos",10.95],["Reflexologia Feel2Zen pés / mãos",19.95]
+  ],
+  "Rosto": [
+    ["Limpeza de pele",31.5],["Mini facial com massagem",ASK],["Lifting de pestanas",ASK],
+    ["1ª aplicação extensão de pestanas (volume russo)",ASK],["Manutenção mensal de extensão de pestanas",ASK],
+    ["Manutenção quinzenal de extensão de pestanas",ASK]
+  ],
+  "Corpo e outros": [
+    ["Gessoterapia (1 sessão)",ASK],["Esfoliação corporal (1 sessão)",ASK],["Criterapia (1 sessão)",ASK],
+    ["Cavitação (1 sessão)",ASK],["Radiofrequência (1 sessão)",ASK],["Pressoterapia (1 sessão)",ASK],
+    ["Pack spa de rosto e cabeça",ASK],["Pack corpo relax",ASK]
+  ]
+};
+const tabs=document.getElementById('tabs'), list=document.getElementById('list');
+const fmt=n=>n.toFixed(2).replace('.',',')+' €';
+function show(cat){
+  tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.textContent===cat));
+  list.innerHTML='';
+  DATA[cat].forEach(([name,price])=>{
+    const d=document.createElement('div'); d.className='item';
+    const s=document.createElement('span'); s.textContent=name;
+    const p=document.createElement('span'); p.className='price'+(price==null?' ask':'');
+    p.textContent=price==null?'Consultar':fmt(price);
+    d.append(s,p); list.append(d);
+  });
+}
+Object.keys(DATA).forEach(c=>{
+  const b=document.createElement('button'); b.textContent=c; b.onclick=()=>show(c); tabs.append(b);
+});
+show(Object.keys(DATA)[0]);
+document.getElementById('y').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
