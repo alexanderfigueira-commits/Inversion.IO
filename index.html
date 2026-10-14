@@ -61,6 +61,13 @@
   .price.ask{font-weight:400;color:var(--muted)}
   .note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:14px}
   .med{background:linear-gradient(180deg,var(--bg),var(--soft))}
+  .candle{display:block;width:170px;max-width:60%;height:auto;margin:0 auto 8px;overflow:visible}
+  .candle .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flick 2.6s ease-in-out infinite}
+  .candle .flame2{transform-box:fill-box;transform-origin:50% 100%;animation:flick 1.9s ease-in-out infinite reverse}
+  .candle .glow{animation:glow 3.2s ease-in-out infinite}
+  @keyframes flick{0%,100%{transform:scale(1,1) skewX(0)}25%{transform:scale(.96,1.05) skewX(-2deg)}55%{transform:scale(1.03,.96) skewX(2deg)}80%{transform:scale(.98,1.04) skewX(-1deg)}}
+  @keyframes glow{0%,100%{opacity:.85}50%{opacity:.6}}
+  @media (prefers-reduced-motion:reduce){.candle .flame,.candle .flame2,.candle .glow{animation:none}}
   .med-grid{display:grid;gap:32px;grid-template-columns:1fr 1fr;align-items:center}
   .breath{display:flex;flex-direction:column;align-items:center;gap:20px}
   .orb-wrap{width:240px;height:240px;display:grid;place-items:center}
@@ -153,7 +160,26 @@
 
   <section id="meditacao" class="med">
     <div class="wrap">
-      <div class="head"><h2 data-i18n="med_h"></h2><p data-i18n="med_p"></p></div>
+      <div class="head">
+        <svg class="candle" viewBox="0 0 240 230" role="img" aria-label="Vela" >
+          <defs>
+            <radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd27a" stop-opacity=".75"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+            <linearGradient id="cf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff9a2e"/><stop offset=".55" stop-color="#ffc94d"/><stop offset="1" stop-color="#fff3b8"/></linearGradient>
+            <linearGradient id="cw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f3eaf0"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#ece0e8"/></linearGradient>
+            <linearGradient id="cb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f1e6ee" stop-opacity=".95"/><stop offset=".4" stop-color="#ffffff" stop-opacity=".98"/><stop offset="1" stop-color="#e8dae3" stop-opacity=".95"/></linearGradient>
+          </defs>
+          <ellipse class="glow" cx="120" cy="70" rx="95" ry="75" fill="url(#cg)"/>
+          <ellipse cx="120" cy="205" rx="92" ry="12" fill="#801557" opacity=".16"/>
+          <path d="M34 118 L206 118 L194 196 Q192 208 178 208 L62 208 Q48 208 46 196 Z" fill="url(#cb)" stroke="#801557" stroke-opacity=".28" stroke-width="2"/>
+          <path d="M56 130 L62 192" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+          <ellipse cx="120" cy="118" rx="86" ry="17" fill="#fff" stroke="#801557" stroke-opacity=".28" stroke-width="2"/>
+          <ellipse cx="120" cy="116" rx="74" ry="12" fill="url(#cw)"/>
+          <path d="M120 116 L120 98" stroke="#4a3541" stroke-width="4" stroke-linecap="round"/>
+          <path class="flame" d="M120 36 C134 60 142 76 120 98 C98 76 106 60 120 36 Z" fill="url(#cf)"/>
+          <path class="flame2" d="M120 64 C127 76 130 84 120 96 C110 84 113 76 120 64 Z" fill="#fffbe6" opacity=".95"/>
+        </svg>
+        <h2 data-i18n="med_h"></h2><p data-i18n="med_p"></p>
+      </div>
       <div class="med-grid">
         <div class="breath">
           <div class="orb-wrap"><div class="orb" id="orb" aria-live="polite"></div></div>
