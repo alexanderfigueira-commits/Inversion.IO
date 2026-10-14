@@ -3,78 +3,85 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Feel2Zen | Estética e Massagens</title>
-<meta name="description" content="Feel2Zen: massagens, reflexologia, manicure, pedicure, depilação, pestanas e tratamentos de estética. Marque a sua consulta online.">
+<title>Feel2Zen</title>
+<meta name="description" content="Feel2Zen by Sónia Serra: massagens, reflexologia, unhas, depilação, pestanas e estética em S. Domingos de Rana.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#faf8f5; --card:#ffffff; --ink:#2b2833; --muted:#6b6676;
-    --accent:#8a5fa8; --accent-dark:#6f4a8b; --sage:#7d9a86; --line:#e9e4ee; --soft:#f1eaf6;
+    --bg:#fcf8fb; --card:#ffffff; --ink:#2a2028; --muted:#6e5f69;
+    --accent:#801557; --accent-dark:#651245; --on-accent:#ffffff; --line:#ecdfe8; --soft:#f6e9f1;
   }
-  @media (prefers-color-scheme: dark){
-    :root{ --bg:#17151b; --card:#201d26; --ink:#f1edf5; --muted:#aaa3b5; --accent:#b68ad4; --accent-dark:#c9a3e4; --sage:#9bb8a3; --line:#332f3b; --soft:#2a2433; }
-  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#1a1217; --card:#261b23; --ink:#f6edf2; --muted:#bba8b4; --accent:#ff82d0; --accent-dark:#ffa6dc; --on-accent:#3a0a26; --line:#3b2a35; --soft:#2d1e28; color-scheme:dark } }
+  :root[data-theme="dark"]{ --bg:#1a1217; --card:#261b23; --ink:#f6edf2; --muted:#bba8b4; --accent:#ff82d0; --accent-dark:#ffa6dc; --on-accent:#3a0a26; --line:#3b2a35; --soft:#2d1e28; color-scheme:dark }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
-  h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.15;margin:0}
+  h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.15;margin:0;text-wrap:balance}
   a{color:inherit}
   .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
   header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-  nav{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .logo{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:600;text-decoration:none;color:var(--accent-dark)}
-  .logo span{color:var(--sage)}
+  nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:600;text-decoration:none;color:var(--accent)}
+  .logo img{width:40px;height:40px;border-radius:50%;object-fit:cover}
   nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0}
   nav ul a{text-decoration:none;color:var(--muted);font-size:.95rem}
   nav ul a:hover{color:var(--accent)}
-  .btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:12px 24px;border-radius:999px;font-weight:600;font-size:.95rem;transition:background .2s,transform .2s}
+  .right{display:flex;align-items:center;gap:12px}
+  .lang{display:flex;gap:6px}
+  .lang button{padding:3px;border:2px solid transparent;border-radius:6px;background:none;cursor:pointer;line-height:0;opacity:.55}
+  .lang button[aria-pressed="true"]{border-color:var(--accent);opacity:1}
+  .lang svg{width:28px;height:19px;border-radius:3px;display:block}
+  .btn{display:inline-block;background:var(--accent);color:var(--on-accent);text-decoration:none;padding:12px 24px;border-radius:999px;font-weight:600;font-size:.95rem;transition:background .2s,transform .2s}
   .btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
-  .btn.ghost{background:transparent;color:var(--accent-dark);border:1.5px solid var(--accent)}
+  .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
   .btn.ghost:hover{background:var(--soft)}
-  .hero{padding:84px 0 72px;text-align:center;background:radial-gradient(900px 380px at 50% 0,var(--soft),transparent)}
-  .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);margin-bottom:16px}
-  .hero p{max-width:560px;margin:0 auto 28px;color:var(--muted);font-size:1.1rem}
-  .hero .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn:focus-visible,.tabs button:focus-visible,.lang button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .hero{padding:64px 0 64px;background:radial-gradient(900px 380px at 50% 0,var(--soft),transparent)}
+  .hero .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+  .hero h1{font-size:clamp(2.6rem,6vw,4.3rem);margin-bottom:16px}
+  .hero p{max-width:520px;margin:0 0 28px;color:var(--muted);font-size:1.1rem}
+  .hero .actions{display:flex;gap:12px;flex-wrap:wrap}
+  .hero img{width:100%;max-width:360px;justify-self:center;border-radius:28px;display:block}
   section{padding:64px 0}
-  .med{background:linear-gradient(180deg,var(--bg),var(--soft))}
-  .med-grid{display:grid;gap:32px;grid-template-columns:1fr 1fr;align-items:center}
-  .breath{display:flex;flex-direction:column;align-items:center;gap:20px}
-  .orb-wrap{width:240px;height:240px;display:grid;place-items:center}
-  .orb{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;text-align:center;font-size:.95rem;color:#fff;
-    background:radial-gradient(circle at 35% 30%,var(--sage),var(--accent));box-shadow:0 0 50px color-mix(in srgb,var(--accent) 45%,transparent);
-    transition:transform 4s ease-in-out}
-  .orb.in{transform:scale(2)} .orb.hold{transform:scale(2);transition-duration:.2s} .orb.out{transform:scale(1);transition-duration:6s}
-  .steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-  .steps li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-  .steps b{display:block;font-family:"Cormorant Garamond",serif;font-size:1.3rem;color:var(--accent-dark)}
-  .steps span{color:var(--muted);font-size:.95rem}
-  @media (prefers-reduced-motion:reduce){.orb{transition:none!important}}
-  @media (max-width:720px){.med-grid{grid-template-columns:1fr}}
   .head{text-align:center;margin-bottom:36px}
   .head h2{font-size:clamp(2rem,4.5vw,2.8rem);margin-bottom:8px}
   .head p{color:var(--muted);margin:0}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}
-  .card h3{font-size:1.45rem;margin-bottom:6px;color:var(--accent-dark)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;min-width:0}
+  .card h3{font-size:1.45rem;margin-bottom:6px;color:var(--accent)}
   .card p{margin:0;color:var(--muted);font-size:.95rem}
   .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
   .tabs button{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
-  .tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
   .list{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px 24px}
   .item{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
   .item:last-child{border-bottom:0}
-  .item small{display:block;color:var(--muted);font-size:.85rem;line-height:1.4;margin-top:2px}
-  .price{white-space:nowrap;font-weight:600;color:var(--accent-dark)}
+  .price{white-space:nowrap;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
   .price.ask{font-weight:400;color:var(--muted)}
   .note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:14px}
+  .med{background:linear-gradient(180deg,var(--bg),var(--soft))}
+  .med-grid{display:grid;gap:32px;grid-template-columns:1fr 1fr;align-items:center}
+  .breath{display:flex;flex-direction:column;align-items:center;gap:20px}
+  .orb-wrap{width:240px;height:240px;display:grid;place-items:center}
+  .orb{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;text-align:center;font-size:.95rem;font-weight:600;color:#fff;
+    background:radial-gradient(circle at 35% 30%,#e0589f,#801557);box-shadow:0 0 50px rgba(224,88,159,.45);
+    transition:transform 4s ease-in-out}
+  .orb.in{transform:scale(2)} .orb.hold{transform:scale(2);transition-duration:.2s} .orb.out{transform:scale(1);transition-duration:6s}
+  .steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+  .steps li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .steps b{display:block;font-family:"Cormorant Garamond",serif;font-size:1.3rem;color:var(--accent)}
+  .steps span{color:var(--muted);font-size:.95rem}
   .about{background:var(--soft)}
   .about .wrap{max-width:720px;text-align:center}
-  .about p{color:var(--muted);font-size:1.05rem}
+  .about p{color:var(--muted);font-size:1.05rem;margin:0 0 16px}
+  .about p.tag{font-family:"Cormorant Garamond",serif;font-size:1.8rem;color:var(--accent);font-weight:600;margin:28px 0 0}
   .contact-box{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
   .contact-box .card h3{font-size:1.3rem}
   footer{padding:32px 0;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.9rem}
-  @media (max-width:720px){ nav ul{display:none} .hero{padding:56px 0 48px} .list{padding:4px 16px} }
+  @media (prefers-reduced-motion:reduce){.orb{transition:none!important} html{scroll-behavior:auto}}
+  @media (max-width:820px){ nav ul{display:none} .hero .wrap{grid-template-columns:1fr} .hero img{max-width:240px;order:-1} .hero{padding:40px 0} .med-grid{grid-template-columns:1fr} .list{padding:4px 16px} }
+  @media (max-width:420px){ .logo span{display:none} .btn{padding:10px 16px} }
 </style>
 </head>
 <body>
@@ -82,15 +89,25 @@
 <header>
   <div class="wrap">
     <nav>
-      <a class="logo" href="#top">Feel<span>2</span>Zen</a>
+      <a class="logo" href="#top"><img src="logo.webp" alt=""><span>Feel2Zen</span></a>
       <ul>
-        <li><a href="#categorias">Tratamentos</a></li>
-        <li><a href="#precos">Preços</a></li>
-        <li><a href="#meditacao">Meditação</a></li>
-        <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#contacto">Contacto</a></li>
+        <li><a href="#categorias" data-i18n="nav_treat"></a></li>
+        <li><a href="#precos" data-i18n="nav_prices"></a></li>
+        <li><a href="#meditacao" data-i18n="nav_med"></a></li>
+        <li><a href="#sobre" data-i18n="nav_about"></a></li>
+        <li><a href="#contacto" data-i18n="nav_contact"></a></li>
       </ul>
-      <a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener">Marcar</a>
+      <div class="right">
+        <div class="lang" role="group" aria-label="Idioma / Language">
+          <button type="button" data-lang="pt" aria-label="Português" title="Português">
+            <svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#d62828"/><rect width="12" height="20" fill="#0a7a3d"/><circle cx="12" cy="10" r="3.4" fill="#f4c20d" stroke="#fff" stroke-width=".8"/></svg>
+          </button>
+          <button type="button" data-lang="en" aria-label="English" title="English">
+            <svg viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#012169"/><path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0L60 40M60 0L0 40" stroke="#c8102e" stroke-width="3"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="12"/><path d="M30 0V40M0 20H60" stroke="#c8102e" stroke-width="7"/></svg>
+          </button>
+        </div>
+        <a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener" data-i18n="book_short"></a>
+      </div>
     </nav>
   </div>
 </header>
@@ -98,77 +115,83 @@
 <main id="top">
   <div class="hero">
     <div class="wrap">
-      <h1>Um momento só para si</h1>
-      <p>Massagens, reflexologia, unhas, depilação e estética. Pare um pouco, respire e deixe-nos cuidar de si.</p>
-      <div class="actions">
-        <a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener">Marcar online</a>
-        <a class="btn ghost" href="#precos">Ver preços</a>
+      <div>
+        <h1 data-i18n="hero_h"></h1>
+        <p data-i18n="hero_p"></p>
+        <div class="actions">
+          <a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener" data-i18n="book_online"></a>
+          <a class="btn ghost" href="#precos" data-i18n="see_prices"></a>
+        </div>
       </div>
+      <img src="logo.webp" alt="Feel2Zen by Sónia Serra">
     </div>
   </div>
 
   <section id="categorias">
     <div class="wrap">
-      <div class="head"><h2>O que fazemos</h2><p>Tratamentos pensados para relaxar e para cuidar.</p></div>
+      <div class="head"><h2 data-i18n="what_h"></h2><p data-i18n="what_p"></p></div>
       <div class="cards">
-        <div class="card"><h3>Massagens</h3><p>Relax, terapêutica, drenagem linfática, anti celulite, havaiana, bambu, hot oil e rituais.</p></div>
-        <div class="card"><h3>Reflexologia</h3><p>Estimulação de pontos nos pés e nas mãos para aliviar tensão e recuperar energia.</p></div>
-        <div class="card"><h3>Mãos e pés</h3><p>Manicure, pedicure, gelinho, gel, acrílico e tratamentos com parafina.</p></div>
-        <div class="card"><h3>Depilação</h3><p>Cera e threading para rosto e corpo, em zonas individuais ou em pack.</p></div>
-        <div class="card"><h3>Pestanas</h3><p>Extensões, manutenção e lifting para um olhar mais marcado.</p></div>
-        <div class="card"><h3>Rosto e corpo</h3><p>Limpeza de pele, mini facial, esfoliação corporal, cavitação e radiofrequência.</p></div>
+        <div class="card"><h3 data-i18n="c1_h"></h3><p data-i18n="c1_p"></p></div>
+        <div class="card"><h3 data-i18n="c2_h"></h3><p data-i18n="c2_p"></p></div>
+        <div class="card"><h3 data-i18n="c3_h"></h3><p data-i18n="c3_p"></p></div>
+        <div class="card"><h3 data-i18n="c4_h"></h3><p data-i18n="c4_p"></p></div>
+        <div class="card"><h3 data-i18n="c5_h"></h3><p data-i18n="c5_p"></p></div>
+        <div class="card"><h3 data-i18n="c6_h"></h3><p data-i18n="c6_p"></p></div>
       </div>
     </div>
   </section>
 
   <section id="precos" style="background:var(--soft)">
     <div class="wrap">
-      <div class="head"><h2>Serviços e preços</h2><p>Escolha uma categoria.</p></div>
-      <div class="tabs" id="tabs" role="group" aria-label="Categorias"></div>
+      <div class="head"><h2 data-i18n="price_h"></h2><p data-i18n="price_p"></p></div>
+      <div class="tabs" id="tabs" role="group"></div>
       <div class="list" id="list" aria-live="polite"></div>
-      <p class="note">Os valores podem mudar. Confirme sempre no momento da marcação.</p>
-      <p style="text-align:center;margin-top:24px"><a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener">Marcar agora</a></p>
+      <p class="note" data-i18n="price_note"></p>
+      <p style="text-align:center;margin-top:24px"><a class="btn" href="https://buk.pt/feel2zen" target="_blank" rel="noopener" data-i18n="book_now"></a></p>
     </div>
   </section>
 
   <section id="meditacao" class="med">
     <div class="wrap">
-      <div class="head"><h2>Meditação</h2><p>Cinco minutos de calma, onde estiver.</p></div>
+      <div class="head"><h2 data-i18n="med_h"></h2><p data-i18n="med_p"></p></div>
       <div class="med-grid">
         <div class="breath">
-          <div class="orb-wrap"><div class="orb" id="orb" aria-live="polite">Pronto?</div></div>
-          <button class="btn" id="breathBtn" type="button">Começar a respirar</button>
-          <p class="note" style="margin:0">Inspire 4 segundos, segure 2, expire 6.</p>
+          <div class="orb-wrap"><div class="orb" id="orb" aria-live="polite"></div></div>
+          <button class="btn" id="breathBtn" type="button"></button>
+          <p class="note" style="margin:0" data-i18n="med_rhythm"></p>
         </div>
         <ol class="steps">
-          <li><b>1. Sente-se confortável</b><span>Costas direitas mas sem tensão, ombros soltos, mãos pousadas no colo.</span></li>
-          <li><b>2. Siga a respiração</b><span>Não tente controlá-la. Apenas repare no ar a entrar e a sair.</span></li>
-          <li><b>3. Volte sempre que se distrair</b><span>Os pensamentos vão aparecer. Reconheça-os e regresse à respiração, sem se criticar.</span></li>
-          <li><b>4. Termine devagar</b><span>Mexa os dedos, abra os olhos e leve esta calma para o resto do dia.</span></li>
+          <li><b data-i18n="s1_h"></b><span data-i18n="s1_p"></span></li>
+          <li><b data-i18n="s2_h"></b><span data-i18n="s2_p"></span></li>
+          <li><b data-i18n="s3_h"></b><span data-i18n="s3_p"></span></li>
+          <li><b data-i18n="s4_h"></b><span data-i18n="s4_p"></span></li>
         </ol>
       </div>
-      <p style="text-align:center;margin-top:32px"><a class="btn ghost" href="https://buk.pt/feel2zen" target="_blank" rel="noopener">Combinar com uma massagem</a></p>
+      <p style="text-align:center;margin-top:32px"><a class="btn ghost" href="https://buk.pt/feel2zen" target="_blank" rel="noopener" data-i18n="med_cta"></a></p>
     </div>
   </section>
 
   <section id="sobre" class="about">
     <div class="wrap">
-      <div class="head"><h2>Sobre a Feel2Zen</h2></div>
-      <p>A Feel2Zen é um espaço de bem estar onde cada tratamento é feito com calma e atenção. Do cuidado das unhas a uma massagem de corpo inteiro, o objetivo é o mesmo: que saia daqui mais leve do que entrou.</p>
+      <div class="head"><h2 data-i18n="about_h"></h2></div>
+      <p data-i18n="about_1"></p>
+      <p data-i18n="about_2"></p>
+      <p data-i18n="about_3"></p>
+      <p class="tag" data-i18n="about_tag"></p>
     </div>
   </section>
 
   <section id="contacto">
     <div class="wrap">
-      <div class="head"><h2>Contacto</h2><p>A forma mais rápida de marcar é online.</p></div>
+      <div class="head"><h2 data-i18n="contact_h"></h2><p data-i18n="contact_p"></p></div>
       <div class="contact-box">
-        <div class="card"><h3>Morada</h3><p>Rua do Mercado nº 48A, Tires<br>2785-630 S. Domingos de Rana</p></div>
-        <div class="card"><h3>Telefone e e-mail</h3><p><a href="tel:+351912508447">912 508 447</a><br><a href="mailto:feel2zen@gmail.com">feel2zen@gmail.com</a></p></div>
-        <div class="card"><h3>Horário</h3>
-          <p><b>2ª a 4ª feira</b><br>10h às 14h e 15h às 19h30</p>
-          <p style="margin-top:10px"><b>6ª feira e sábado</b><br>10h às 14h e 15h às 19h30</p>
+        <div class="card"><h3 data-i18n="addr_h"></h3><p>Rua do Mercado nº 48A, Tires<br>2785-630 S. Domingos de Rana</p></div>
+        <div class="card"><h3 data-i18n="phone_h"></h3><p><a href="tel:+351912508447">912 508 447</a><br><a href="mailto:feel2zen@gmail.com">feel2zen@gmail.com</a></p></div>
+        <div class="card"><h3 data-i18n="hours_h"></h3>
+          <p><b data-i18n="days1"></b><br>10h – 14h · 15h – 19h30</p>
+          <p style="margin-top:10px"><b data-i18n="days2"></b><br>10h – 14h · 15h – 19h30</p>
         </div>
-        <div class="card"><h3>Marcações e redes</h3>
+        <div class="card"><h3 data-i18n="social_h"></h3>
           <p><a href="https://buk.pt/feel2zen" target="_blank" rel="noopener">buk.pt/feel2zen</a><br>
           <a href="https://www.facebook.com/Feel2Zen-1437150236302191/" target="_blank" rel="noopener">Facebook</a></p>
         </div>
@@ -177,80 +200,175 @@
   </section>
 </main>
 
-<footer><div class="wrap">© <span id="y"></span> Feel2Zen · Rua do Mercado nº 48A, Tires, S. Domingos de Rana · 912 508 447</div></footer>
+<footer><div class="wrap">© <span id="y"></span> Feel2Zen by Sónia Serra · Rua do Mercado nº 48A, Tires, S. Domingos de Rana · 912 508 447</div></footer>
 
 <script>
-const ASK = null;
+const T = {
+  pt: {
+    nav_treat:"Tratamentos", nav_prices:"Preços", nav_med:"Meditação", nav_about:"Sobre nós", nav_contact:"Contacto",
+    book_short:"Marcar", book_online:"Marcar online", book_now:"Marcar agora", see_prices:"Ver preços",
+    hero_h:"Um momento só para si",
+    hero_p:"Massagens, reflexologia, unhas, depilação e estética. Pare um pouco, respire e deixe-nos cuidar de si.",
+    what_h:"O que fazemos", what_p:"Tratamentos pensados para relaxar e para cuidar.",
+    c1_h:"Massagens", c1_p:"Relax, terapêutica, drenagem linfática, anti celulite, havaiana, bambu, hot oil e rituais.",
+    c2_h:"Reflexologia", c2_p:"Estimulação de pontos nos pés e nas mãos para aliviar tensão e recuperar energia.",
+    c3_h:"Mãos e pés", c3_p:"Manicure, pedicure, gelinho, gel, acrílico e tratamentos com parafina.",
+    c4_h:"Depilação", c4_p:"Cera e threading para rosto e corpo, em zonas individuais ou em pack.",
+    c5_h:"Pestanas", c5_p:"Extensões, manutenção e lifting para um olhar mais marcado.",
+    c6_h:"Rosto e corpo", c6_p:"Limpeza de pele, mini facial, esfoliação corporal, cavitação e radiofrequência.",
+    price_h:"Serviços e preços", price_p:"Escolha uma categoria.",
+    price_note:"Os valores podem mudar. Confirme sempre no momento da marcação.", ask:"Consultar",
+    med_h:"Meditação", med_p:"Cinco minutos de calma, onde estiver.",
+    med_rhythm:"Inspire 4 segundos, segure 2, expire 6.",
+    b_ready:"Pronto?", b_in:"Inspire", b_hold:"Segure", b_out:"Expire", b_start:"Começar a respirar", b_stop:"Parar",
+    s1_h:"1. Sente-se confortável", s1_p:"Costas direitas mas sem tensão, ombros soltos, mãos pousadas no colo.",
+    s2_h:"2. Siga a respiração", s2_p:"Não tente controlá-la. Apenas repare no ar a entrar e a sair.",
+    s3_h:"3. Volte sempre que se distrair", s3_p:"Os pensamentos vão aparecer. Reconheça-os e regresse à respiração, sem se criticar.",
+    s4_h:"4. Termine devagar", s4_p:"Mexa os dedos, abra os olhos e leve esta calma para o resto do dia.",
+    med_cta:"Combinar com uma massagem",
+    about_h:"Sobre nós",
+    about_1:"O nosso espaço abriu portas a 17 de Setembro de 2016 para promover o bem estar físico e emocional a todos aqueles que nos visitem.",
+    about_2:"Conta com uma profissional formada em diversas áreas para que se sinta sempre em boas mãos.",
+    about_3:"Temos um espaço agradável com música ambiente, situado num local não muito longe da agitação quotidiana e ao mesmo tempo onde pode refugiar-se do stress do dia a dia.",
+    about_tag:"Feel2Zen é onde começa o seu bem estar",
+    contact_h:"Contacto", contact_p:"A forma mais rápida de marcar é online.",
+    addr_h:"Morada", phone_h:"Telefone e e-mail", hours_h:"Horário",
+    days1:"2ª a 4ª feira", days2:"6ª feira e sábado", social_h:"Marcações e redes",
+    t_hands:"Mãos e pés", t_wax:"Depilação", t_mass:"Massagens", t_refl:"Reflexologia", t_face:"Rosto", t_body:"Corpo e outros"
+  },
+  en: {
+    nav_treat:"Treatments", nav_prices:"Prices", nav_med:"Meditation", nav_about:"About us", nav_contact:"Contact",
+    book_short:"Book", book_online:"Book online", book_now:"Book now", see_prices:"See prices",
+    hero_h:"A moment just for you",
+    hero_p:"Massage, reflexology, nails, waxing and beauty care. Slow down, breathe, and let us look after you.",
+    what_h:"What we do", what_p:"Treatments designed to relax and to care.",
+    c1_h:"Massage", c1_p:"Relaxing, therapeutic, lymphatic drainage, anti cellulite, Hawaiian, bamboo, hot oil and rituals.",
+    c2_h:"Reflexology", c2_p:"Pressure on points of the feet and hands to ease tension and restore energy.",
+    c3_h:"Hands and feet", c3_p:"Manicure, pedicure, gel polish, gel, acrylic and paraffin treatments.",
+    c4_h:"Waxing", c4_p:"Wax and threading for face and body, by area or as a pack.",
+    c5_h:"Lashes", c5_p:"Extensions, maintenance and lifting for a more defined look.",
+    c6_h:"Face and body", c6_p:"Facial cleansing, mini facial, body exfoliation, cavitation and radiofrequency.",
+    price_h:"Services and prices", price_p:"Pick a category.",
+    price_note:"Prices may change. Always confirm when you book.", ask:"Ask us",
+    med_h:"Meditation", med_p:"Five minutes of calm, wherever you are.",
+    med_rhythm:"Breathe in for 4 seconds, hold for 2, breathe out for 6.",
+    b_ready:"Ready?", b_in:"Breathe in", b_hold:"Hold", b_out:"Breathe out", b_start:"Start breathing", b_stop:"Stop",
+    s1_h:"1. Sit comfortably", s1_p:"Back straight but relaxed, shoulders loose, hands resting in your lap.",
+    s2_h:"2. Follow your breath", s2_p:"Don't try to control it. Just notice the air coming in and going out.",
+    s3_h:"3. Come back when you drift", s3_p:"Thoughts will show up. Acknowledge them and return to your breath, without judging yourself.",
+    s4_h:"4. Finish slowly", s4_p:"Wiggle your fingers, open your eyes and take this calm into the rest of your day.",
+    med_cta:"Pair it with a massage",
+    about_h:"About us",
+    about_1:"Our space opened its doors on 17 September 2016 to promote physical and emotional well-being for everyone who visits us.",
+    about_2:"You will be looked after by a professional trained in several areas, so you always feel in good hands.",
+    about_3:"We have a pleasant space with ambient music, not far from the hustle of daily life, yet a place where you can take refuge from everyday stress.",
+    about_tag:"Feel2Zen is where your well-being begins",
+    contact_h:"Contact", contact_p:"The quickest way to book is online.",
+    addr_h:"Address", phone_h:"Phone and e-mail", hours_h:"Opening hours",
+    days1:"Monday to Wednesday", days2:"Friday and Saturday", social_h:"Booking and social",
+    t_hands:"Hands and feet", t_wax:"Waxing", t_mass:"Massage", t_refl:"Reflexology", t_face:"Face", t_body:"Body and more"
+  }
+};
+const ASK=null;
+// [pt, en, price]
 const DATA = {
-  "Mãos e pés": [
-    ["Manicure normal",7.95],["Pedicure normal",16.8],["Pedicure normal + reflexologia",19.95],
-    ["Aplicação de gelinho",13.65],["Pedicure com gelinho",22.05],["Manicure com blindagem",14.7],
-    ["Aplicação de gel com extensão",26.25],["Aplicação de gel sem extensão",23.1],["Manutenção de gel",21],
-    ["Aplicação de acrílico 1ª vez",31.5],["Manutenção de acrílico",21],["Troca de cor de gel",13.65],
-    ["Remover gel / acrílico",10.75],["Pedicure com parafina",24.15],["Manicure com parafina",15.75],
-    ["Pintura normal de unhas",ASK],["Manicure com pindas / pedicure com vela",ASK]
+  t_hands: [
+    ["Manicure normal","Regular manicure",7.95],["Pedicure normal","Regular pedicure",16.8],
+    ["Pedicure normal + reflexologia","Regular pedicure + reflexology",19.95],
+    ["Aplicação de gelinho","Gel polish application",13.65],["Pedicure com gelinho","Pedicure with gel polish",22.05],
+    ["Manicure com blindagem","Manicure with gel overlay",14.7],
+    ["Aplicação de gel com extensão","Gel application with extension",26.25],["Aplicação de gel sem extensão","Gel application without extension",23.1],
+    ["Manutenção de gel","Gel maintenance",21],["Aplicação de acrílico 1ª vez","Acrylic application, first time",31.5],
+    ["Manutenção de acrílico","Acrylic maintenance",21],["Troca de cor de gel","Gel colour change",13.65],
+    ["Remover gel / acrílico","Gel / acrylic removal",10.75],["Pedicure com parafina","Pedicure with paraffin",24.15],
+    ["Manicure com parafina","Manicure with paraffin",15.75],["Pintura normal de unhas","Regular nail polish",ASK]
   ],
-  "Depilação": [
-    ["Pack depilação a cera",29.25],["Threading rosto",21],["Threading buço e sobrancelhas",21],
-    ["Threading sobrancelhas",7.35],["Threading buço",7.35],["Depilação a cera: perna inteira",ASK],
-    ["Depilação a cera: meia perna",ASK],["Depilação a cera: virilha",ASK],["Depilação a cera: axilas",ASK],
-    ["Depilação a cera: braços",ASK],["Depilação a cera: sobrancelhas",ASK],["Depilação a cera: buço",ASK]
+  t_wax: [
+    ["Pack depilação a cera","Waxing pack",29.25],["Threading rosto","Face threading",21],
+    ["Threading buço e sobrancelhas","Upper lip and eyebrow threading",21],["Threading sobrancelhas","Eyebrow threading",7.35],
+    ["Threading buço","Upper lip threading",7.35],["Cera: perna inteira","Wax: full leg",ASK],["Cera: meia perna","Wax: half leg",ASK],
+    ["Cera: virilha","Wax: bikini line",ASK],["Cera: axilas","Wax: underarms",ASK],["Cera: braços","Wax: arms",ASK],
+    ["Cera: sobrancelhas","Wax: eyebrows",ASK],["Cera: buço","Wax: upper lip",ASK]
   ],
-  "Massagens": [
-    ["Massagem anti celulite (1 sessão)",31.5],["Drenagem linfática manual (método Vodder, 1 sessão)",31.5],
-    ["Massagem terapêutica (60 min)",27.3],["Massagem terapêutica (corpo inteiro)",47.25],
-    ["Massagem Feel2Zen Relax (corpo inteiro)",36.9],["Massagem de costas (tabida, 1 sessão)",25.2],
-    ["Massagem havaiana (corpo inteiro)",ASK],["Massagem Bambu Relax (corpo inteiro)",36.75],
-    ["Massagem rock relax (corpo inteiro)",ASK],["Massagem Hot oil (corpo inteiro)",ASK],
-    ["Massagem Chapai Feel2Zen (cabeça)",ASK],["Massagem com velas",ASK],["Massagem para 2 pessoas",ASK],
-    ["Ritual egípcio (esfoliação corporal + massagem + chá)",ASK]
+  t_mass: [
+    ["Massagem anti celulite (1 sessão)","Anti cellulite massage (1 session)",31.5],
+    ["Drenagem linfática manual, método Vodder (1 sessão)","Manual lymphatic drainage, Vodder method (1 session)",31.5],
+    ["Massagem terapêutica (60 min)","Therapeutic massage (60 min)",27.3],["Massagem terapêutica (corpo inteiro)","Therapeutic massage (full body)",47.25],
+    ["Massagem Feel2Zen Relax (corpo inteiro)","Feel2Zen Relax massage (full body)",36.9],["Massagem de costas (1 sessão)","Back massage (1 session)",25.2],
+    ["Massagem havaiana (corpo inteiro)","Hawaiian massage (full body)",ASK],["Massagem Bambu Relax (corpo inteiro)","Bamboo Relax massage (full body)",36.75],
+    ["Massagem rock relax (corpo inteiro)","Rock relax massage (full body)",ASK],["Massagem Hot oil (corpo inteiro)","Hot oil massage (full body)",ASK],
+    ["Massagem Chapai Feel2Zen (cabeça)","Feel2Zen Chapai massage (head)",ASK],["Massagem com velas","Candle massage",ASK],
+    ["Massagem para 2 pessoas","Massage for 2 people",ASK],["Ritual egípcio (esfoliação + massagem + chá)","Egyptian ritual (exfoliation + massage + tea)",ASK]
   ],
-  "Reflexologia": [
-    ["Reflexologia Feel2Zen mãos",10.95],["Reflexologia Feel2Zen pés / mãos",19.95]
+  t_refl: [
+    ["Reflexologia Feel2Zen mãos","Feel2Zen hand reflexology",10.95],["Reflexologia Feel2Zen pés / mãos","Feel2Zen foot / hand reflexology",19.95]
   ],
-  "Rosto": [
-    ["Limpeza de pele",31.5],["Mini facial com massagem",ASK],["Lifting de pestanas",ASK],
-    ["1ª aplicação extensão de pestanas (volume russo)",ASK],["Manutenção mensal de extensão de pestanas",ASK],
-    ["Manutenção quinzenal de extensão de pestanas",ASK]
+  t_face: [
+    ["Limpeza de pele","Facial cleansing",31.5],["Mini facial com massagem","Mini facial with massage",ASK],
+    ["Lifting de pestanas","Lash lift",ASK],["1ª aplicação extensão de pestanas (volume russo)","First lash extension application (Russian volume)",ASK],
+    ["Manutenção mensal de extensão de pestanas","Monthly lash extension maintenance",ASK],
+    ["Manutenção quinzenal de extensão de pestanas","Fortnightly lash extension maintenance",ASK]
   ],
-  "Corpo e outros": [
-    ["Gessoterapia (1 sessão)",ASK],["Esfoliação corporal (1 sessão)",ASK],["Criterapia (1 sessão)",ASK],
-    ["Cavitação (1 sessão)",ASK],["Radiofrequência (1 sessão)",ASK],["Pressoterapia (1 sessão)",ASK],
-    ["Pack spa de rosto e cabeça",ASK],["Pack corpo relax",ASK]
+  t_body: [
+    ["Gessoterapia (1 sessão)","Plaster therapy (1 session)",ASK],["Esfoliação corporal (1 sessão)","Body exfoliation (1 session)",ASK],
+    ["Criterapia (1 sessão)","Cryotherapy (1 session)",ASK],["Cavitação (1 sessão)","Cavitation (1 session)",ASK],
+    ["Radiofrequência (1 sessão)","Radiofrequency (1 session)",ASK],["Pressoterapia (1 sessão)","Pressotherapy (1 session)",ASK],
+    ["Pack spa de rosto e cabeça","Face and head spa pack",ASK],["Pack corpo relax","Relax body pack",ASK]
   ]
 };
+
+let lang='pt', cat='t_hands', breathState='idle';
+try{ lang = localStorage.getItem('f2z-lang') || ''; }catch(e){ lang=''; }
+if(lang!=='pt' && lang!=='en') lang = (navigator.language||'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+
 const tabs=document.getElementById('tabs'), list=document.getElementById('list');
-const fmt=n=>n.toFixed(2).replace('.',',')+' €';
-function show(cat){
-  tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.textContent===cat));
+const orb=document.getElementById('orb'), bb=document.getElementById('breathBtn');
+const fmt=n=> n.toFixed(2).replace('.', lang==='pt'?',':'.')+' €';
+
+function renderList(){
+  const i = lang==='pt'?0:1;
+  tabs.innerHTML='';
+  Object.keys(DATA).forEach(k=>{
+    const b=document.createElement('button'); b.type='button'; b.textContent=T[lang][k];
+    b.setAttribute('aria-pressed', k===cat); b.onclick=()=>{cat=k;renderList();}; tabs.append(b);
+  });
   list.innerHTML='';
-  DATA[cat].forEach(([name,price])=>{
+  DATA[cat].forEach(row=>{
     const d=document.createElement('div'); d.className='item';
-    const s=document.createElement('span'); s.textContent=name;
-    const p=document.createElement('span'); p.className='price'+(price==null?' ask':'');
-    p.textContent=price==null?'Consultar':fmt(price);
+    const s=document.createElement('span'); s.textContent=row[i];
+    const p=document.createElement('span'); p.className='price'+(row[2]==null?' ask':'');
+    p.textContent = row[2]==null ? T[lang].ask : fmt(row[2]);
     d.append(s,p); list.append(d);
   });
 }
-Object.keys(DATA).forEach(c=>{
-  const b=document.createElement('button'); b.textContent=c; b.onclick=()=>show(c); tabs.append(b);
-});
-show(Object.keys(DATA)[0]);
-document.getElementById('y').textContent=new Date().getFullYear();
+function renderBreathLabels(){
+  if(breathState==='idle'){ orb.textContent=T[lang].b_ready; bb.textContent=T[lang].b_start; }
+  else { bb.textContent=T[lang].b_stop; orb.textContent=T[lang]['b_'+breathState]; }
+}
+function setLang(l){
+  lang=l; try{ localStorage.setItem('f2z-lang',l); }catch(e){}
+  document.documentElement.lang = l==='pt'?'pt-PT':'en';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=T[l][el.dataset.i18n]; });
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.lang===l));
+  renderList(); renderBreathLabels();
+}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 
-const orb=document.getElementById('orb'), bb=document.getElementById('breathBtn');
 let timers=[], running=false;
-function phase(cls,txt,ms,next){orb.className='orb '+cls;orb.textContent=txt;timers.push(setTimeout(next,ms));}
+function phase(cls,ms,next){ breathState=cls; orb.className='orb '+cls; renderBreathLabels(); timers.push(setTimeout(next,ms)); }
 function cycle(){
   if(!running)return;
   orb.style.transitionDuration='4s';
-  phase('in','Inspire',4000,()=>{ if(!running)return;
-    phase('hold','Segure',2000,()=>{ if(!running)return;
+  phase('in',4000,()=>{ if(!running)return;
+    phase('hold',2000,()=>{ if(!running)return;
       orb.style.transitionDuration='6s';
-      phase('out','Expire',6000,cycle);});});
+      phase('out',6000,cycle);});});
 }
-function stop(){running=false;timers.forEach(clearTimeout);timers=[];orb.className='orb';orb.style.transitionDuration='';orb.textContent='Pronto?';bb.textContent='Começar a respirar';}
-bb.onclick=()=>{ if(running){stop();return;} running=true;bb.textContent='Parar';cycle(); };
+function stop(){running=false;timers.forEach(clearTimeout);timers=[];breathState='idle';orb.className='orb';orb.style.transitionDuration='';renderBreathLabels();}
+bb.onclick=()=>{ if(running){stop();return;} running=true;cycle(); };
+
+document.getElementById('y').textContent=new Date().getFullYear();
+setLang(lang);
 </script>
 </body>
 </html>
