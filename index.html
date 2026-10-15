@@ -150,6 +150,19 @@
   .faq details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
   .faq summary{cursor:pointer;font-weight:600;color:var(--accent)}
   .faq p{margin:10px 0 0;color:var(--muted);font-size:.95rem}
+  .wa{margin-top:16px}
+  .wa p{margin-bottom:14px}
+  .wa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .wa-grid label{display:grid;gap:4px;font-size:.85rem;color:var(--muted);min-width:0}
+  .wa-grid .full{grid-column:1/-1}
+  .wa input,.wa select,.wa textarea{font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+  .wa input:focus-visible,.wa select:focus-visible,.wa textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .wa-send{background:#128c4a;color:#fff}
+  .wa-send:hover{background:#0e7439}
+  .wa-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;width:56px;height:56px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.3);transition:transform .2s}
+  .wa-fab:hover{transform:scale(1.07)}
+  .wa-fab:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  @media (max-width:560px){.wa-grid{grid-template-columns:1fr}}
   .contact-box{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
   .contact-box .card h3{font-size:1.3rem}
   footer{padding:32px 0;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.9rem}
@@ -301,9 +314,33 @@
           <a href="https://www.facebook.com/Feel2Zen-1437150236302191/" target="_blank" rel="noopener">Facebook</a></p>
         </div>
       </div>
+      <div class="card wa" id="whatsapp">
+        <h3 data-i18n="wa_h">Envie-nos uma mensagem no WhatsApp</h3>
+        <p data-i18n="wa_p">Preencha os campos e abrimos o WhatsApp com a mensagem pronta para enviar.</p>
+        <div class="wa-grid">
+          <label for="wa-name"><span data-i18n="wa_name">O seu nome</span><input id="wa-name" type="text" autocomplete="name"></label>
+          <label for="wa-service"><span data-i18n="wa_service">Serviço</span>
+            <select id="wa-service">
+              <option value="" data-i18n="wa_choose">Escolha um serviço</option>
+              <option value="t_mass" data-i18n="t_mass">Massagens</option>
+              <option value="t_refl" data-i18n="t_refl">Reflexologia</option>
+              <option value="t_hands" data-i18n="t_hands">Mãos e pés</option>
+              <option value="t_wax" data-i18n="t_wax">Depilação</option>
+              <option value="t_face" data-i18n="t_face">Rosto</option>
+              <option value="t_body" data-i18n="t_body">Corpo e outros</option>
+            </select>
+          </label>
+          <label for="wa-when"><span data-i18n="wa_when">Dia e hora preferidos</span><input id="wa-when" type="text"></label>
+          <label for="wa-msg" class="full"><span data-i18n="wa_msg">Mensagem (opcional)</span><textarea id="wa-msg" rows="3"></textarea></label>
+        </div>
+        <a class="btn wa-send" id="wa-send" href="https://wa.me/351912508447?text=Ol%C3%A1!%20Gostaria%20de%20marcar%20um%20tratamento%20na%20Feel2Zen." target="_blank" rel="noopener"><span data-i18n="wa_send">Enviar por WhatsApp</span></a>
+      </div>
     </div>
   </section>
 </main>
+<a class="wa-fab" id="wa-fab" href="https://wa.me/351912508447?text=Ol%C3%A1!%20Gostaria%20de%20marcar%20um%20tratamento%20na%20Feel2Zen." target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path fill="#fff" d="M16 3C9.4 3 4 8.3 4 14.9c0 2.3.7 4.5 1.9 6.3L4 29l8-2.1c1.7.9 3.5 1.4 5.4 1.4 6.600 0 12-5.300 12-11.900C29.400 8.300 22.600 3 16 3zm0 21.800c-1.700 0-3.400-.5-4.800-1.300l-.4-.2-4.700 1.200 1.300-4.500-.3-.5c-1-1.500-1.500-3.200-1.500-5 0-5.400 4.500-9.700 10-9.700s10 4.300 10 9.700-4.500 9.300-9.600 9.300zm5.500-7.200c-.3-.1-1.800-.9-2.100-1s-.5-.1-.7.100c-.2.300-.8 1-.9 1.200-.2.200-.3.200-.6.100-1.700-.8-2.800-1.500-3.900-3.400-.3-.5.300-.5.900-1.600.1-.2.100-.4 0-.5l-1-2.300c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.100-.8.400-.3.300-1.100 1.100-1.100 2.600s1.100 3 1.300 3.200c.2.200 2.200 3.400 5.300 4.700 2 .8 2.700.9 3.700.7.600-.1 1.800-.7 2.100-1.500.3-.7.300-1.300.2-1.500-.1-.1-.3-.2-.6-.3z"></path></svg>
+</a>
 
 <footer><div class="wrap">© <span id="y">2026</span> Feel2Zen by Sónia Serra · Rua do Mercado nº 48A, Tires, S. Domingos de Rana · 912 508 447</div></footer>
 
@@ -346,6 +383,9 @@ const T = {
     contact_h:"Contacto", contact_p:"A forma mais rápida de marcar é online.",
     addr_h:"Morada", phone_h:"Telefone e e-mail", hours_h:"Horário",
     days1:"2ª a 4ª feira", days2:"6ª feira e sábado", social_h:"Marcações e redes",
+    wa_h:"Envie-nos uma mensagem no WhatsApp", wa_p:"Preencha os campos e abrimos o WhatsApp com a mensagem pronta para enviar.",
+    wa_name:"O seu nome", wa_service:"Serviço", wa_choose:"Escolha um serviço", wa_when:"Dia e hora preferidos", wa_msg:"Mensagem (opcional)", wa_send:"Enviar por WhatsApp",
+    wa_text_hi:"Olá! Gostaria de marcar um tratamento na Feel2Zen.", wa_text_name:"Nome", wa_text_service:"Serviço", wa_text_when:"Dia e hora preferidos",
     t_hands:"Mãos e pés", t_wax:"Depilação", t_mass:"Massagens", t_refl:"Reflexologia", t_face:"Rosto", t_body:"Corpo e outros"
   },
   en: {
@@ -385,6 +425,9 @@ const T = {
     contact_h:"Contact", contact_p:"The quickest way to book is online.",
     addr_h:"Address", phone_h:"Phone and e-mail", hours_h:"Opening hours",
     days1:"Monday to Wednesday", days2:"Friday and Saturday", social_h:"Booking and social",
+    wa_h:"Send us a message on WhatsApp", wa_p:"Fill in the fields and we will open WhatsApp with your message ready to send.",
+    wa_name:"Your name", wa_service:"Service", wa_choose:"Choose a service", wa_when:"Preferred day and time", wa_msg:"Message (optional)", wa_send:"Send on WhatsApp",
+    wa_text_hi:"Hello! I would like to book a treatment at Feel2Zen.", wa_text_name:"Name", wa_text_service:"Service", wa_text_when:"Preferred day and time",
     t_hands:"Hands and feet", t_wax:"Waxing", t_mass:"Massage", t_refl:"Reflexology", t_face:"Face", t_body:"Body and more"
   }
 };
@@ -484,8 +527,21 @@ function setLang(l){
    ['meta[property="og:locale"]',l==='pt'?'pt_PT':'en_GB']].forEach(([q,v])=>{const m=document.querySelector(q); if(m) m.setAttribute('content',v);});
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=T[l][el.dataset.i18n]; });
   document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.lang===l));
-  renderList(); renderBreathLabels(); renderFaqLd();
+  renderList(); renderBreathLabels(); renderFaqLd(); updateWa();
 }
+const WA_NUMBER='351912508447';
+function updateWa(){
+  const t=T[lang], v=id=>document.getElementById(id).value.trim();
+  const svc=document.getElementById('wa-service').value;
+  const lines=[t.wa_text_hi];
+  if(v('wa-name')) lines.push(t.wa_text_name+': '+v('wa-name'));
+  if(svc) lines.push(t.wa_text_service+': '+t[svc]);
+  if(v('wa-when')) lines.push(t.wa_text_when+': '+v('wa-when'));
+  if(v('wa-msg')) lines.push(v('wa-msg'));
+  document.getElementById('wa-send').href='https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(lines.join('\n'));
+  document.getElementById('wa-fab').href='https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(t.wa_text_hi);
+}
+['wa-name','wa-service','wa-when','wa-msg'].forEach(id=>document.getElementById(id).addEventListener('input',updateWa));
 document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 
 let timers=[], running=false;
