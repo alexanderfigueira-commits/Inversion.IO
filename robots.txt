@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.feel2zone.pt/sitemap.xml
+Sitemap: https://www.feel2zen.pt/sitemap.xml

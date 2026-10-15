@@ -9,7 +9,7 @@ catch (e) { playwright = require(path.join(execSync('npm root -g').toString().tr
 
 const root = path.resolve(__dirname, '..');
 const src = path.join(root, 'index.html');
-const SITE = 'https://www.feel2zone.pt/';
+const SITE = 'https://www.feel2zen.pt/';
 
 (async () => {
   const browser = await playwright.chromium.launch();
