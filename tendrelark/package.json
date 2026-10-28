@@ -1,0 +1,29 @@
+{
+  "name": "tendrelark",
+  "version": "1.0.0",
+  "description": "Tendrelark: public tender intelligence for Portugal, Luxembourg and Belgium, with a weekly source-linked newsletter.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch src/server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"test/*.test.js\"",
+    "migrate": "node --disable-warning=ExperimentalWarning bin/cli.js migrate",
+    "db:check": "node --disable-warning=ExperimentalWarning bin/cli.js db:check",
+    "ted:daily": "node --disable-warning=ExperimentalWarning bin/cli.js ted:daily",
+    "ted:ingest": "node --disable-warning=ExperimentalWarning bin/cli.js ted:ingest",
+    "ted:probe": "node --disable-warning=ExperimentalWarning bin/cli.js ted:probe",
+    "ted:reconcile": "node --disable-warning=ExperimentalWarning bin/cli.js ted:reconcile",
+    "sources:verify": "node --disable-warning=ExperimentalWarning bin/cli.js sources:verify",
+    "newsletter:build": "node --disable-warning=ExperimentalWarning bin/cli.js newsletter:build",
+    "newsletter:send": "node --disable-warning=ExperimentalWarning bin/cli.js newsletter:send",
+    "check:production": "node bin/check-production.js"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "nodemailer": "^10.2.1"
+  }
+}
