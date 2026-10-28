@@ -146,7 +146,7 @@ All settings are in `.env.example`.
 - **SMTP.** Nothing is emailed without `SMTP_URL`: signup confirmations, the daily TED report and the newsletter.
 - **Legal details.** Set `LEGAL_ENTITY_NAME` and `LEGAL_ENTITY_DETAILS`. Have the privacy page reviewed by a
   lawyer. It is a plain language draft, not legal advice.
-- **Contact address.** `CONTACT_EMAIL` defaults to `hello@tendrelark.eu`. Check it exists.
+- **Contact and sender address.** `CONTACT_EMAIL` and the "From" address in `MAIL_FROM` both default to `support@tendrelark.eu`. Your SMTP provider must be allowed to send as that address.
 - **A live check of the TED API.** The client follows TED's published request and response shape, and the tests
   run against a stand in server for it. Run `npm run ted:probe` once from a machine that can reach TED to
   confirm the real thing agrees.

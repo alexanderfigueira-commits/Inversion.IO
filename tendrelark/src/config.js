@@ -70,13 +70,13 @@ export function loadConfig(overrides = {}) {
       password: e.ADMIN_PASSWORD || '',
     },
     contact: {
-      email: e.CONTACT_EMAIL || 'hello@tendrelark.eu',
+      email: e.CONTACT_EMAIL || 'support@tendrelark.eu',
       legalName: e.LEGAL_ENTITY_NAME || 'Tendrelark',
       legalDetails: e.LEGAL_ENTITY_DETAILS || '',
     },
     mail: {
       smtpUrl: e.SMTP_URL || '',
-      from: e.MAIL_FROM || 'Tendrelark <newsletter@tendrelark.eu>',
+      from: e.MAIL_FROM || 'Tendrelark <support@tendrelark.eu>',
       // 'memory' is used by tests so nothing is printed or sent.
       transport: e.MAIL_TRANSPORT || '',
     },

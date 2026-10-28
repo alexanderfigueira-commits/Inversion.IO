@@ -448,7 +448,7 @@ test('contact form stores an enquiry and emails the team, and stops bots', async
   assert.equal(location(ok), '/contact?status=sent');
   assert.equal(app.db.prepare('SELECT COUNT(*) n FROM enquiries').get().n, 1);
   assert.equal(app.db.prepare('SELECT interest FROM enquiries').get().interest, 'ai_automation');
-  assert.equal(app.mailer.outbox[0].to, 'hello@tendrelark.eu');
+  assert.equal(app.mailer.outbox[0].to, 'support@tendrelark.eu');
   assert.equal(location(await app.post('/contact', { t: app.token(), name: 'Bot', email: 'b@example.com', message: 'spam spam', consent: 'yes', website: 'x' })), '/contact?status=sent');
   assert.equal(app.db.prepare('SELECT COUNT(*) n FROM enquiries').get().n, 1);
   assert.equal(location(await app.post('/contact', { t: app.token(), name: 'X', email: 'bad', message: 'hello there', consent: 'yes' })), '/contact?status=invalid');
