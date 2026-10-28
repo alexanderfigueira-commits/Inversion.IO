@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import { loadConfig } from '../src/config.js';
-import { countPersonalData, erasePersonalData, exportPersonalData, findPersonalData, purgeOldEmailLogs } from '../src/privacy.js';
+import { countPersonalData, erasePersonalData, exportPersonalData, findPersonalData, purgeExpiredPersonalData, reapplyErasures } from '../src/privacy.js';
 import { createBackup, listBackups, pruneBackups, restoreBackup, verifyBackup } from '../src/db/backup.js';
 import { checkEmailDns } from '../src/lib/dns-check.js';
 import { downloadResource, fetchDatasetMeta, judgeFreshness, pickResource, renderDatasetReport, scanCsvDates, scanJsonDates } from '../src/sources/base-dataset.js';
@@ -45,7 +45,7 @@ const HELP = `Tendrelark command line
   privacy:export --email ADDRESS  Everything held about an address, as JSON (for an access request)
   privacy:erase --email ADDRESS --yes
                                   Delete everything held about an address (shows what will go first without --yes)
-  privacy:purge                   Delete email log rows older than EMAIL_LOG_RETENTION_DAYS
+  privacy:purge                   Delete old email logs, unconfirmed signups and old enquiries per the retention settings
   mail:url --host H --port P --user U   Build a correctly encoded SMTP_URL (password from SMTP_PASSWORD or --password)
   mail:test [--to ADDRESS]        Connect to SMTP_URL, log in and send a test email, with plain language errors
   dataset:base [--download] [--max-mb N]
@@ -114,6 +114,10 @@ if (command === 'db:verify-backup' || command === 'db:restore') {
       if (typeof earlyFlags.to !== 'string') throw new Error('Pass --to path/to/new.db');
       const info = await restoreBackup({ file: earlyFlags.from, to: earlyFlags.to, passphrase: cfg.backup.passphrase, force: Boolean(earlyFlags.force) });
       console.log(`Restored to ${earlyFlags.to}: ${info.notices} TED notices, ${info.subscribers} subscribers, ${info.issues} issues, schema v${info.schemaVersion}.`);
+      const restored = openDatabase(earlyFlags.to); // also brings an older backup up to the current schema
+      const again = reapplyErasures(restored, cfg.appSecret);
+      restored.close();
+      console.log(again ? `Applied earlier erasure requests again: removed ${again} rows the backup had brought back.` : 'No earlier erasure requests needed applying again.');
       console.log('Point DATABASE_PATH at it and start the app. Then run: npm run check:production');
     }
     process.exit(0);
@@ -254,13 +258,14 @@ async function main() {
         console.log('Nothing deleted. Run again with --yes to delete all of it. This cannot be undone.');
         return 0;
       }
-      erasePersonalData(db, found.email);
+      erasePersonalData(db, found.email, config.appSecret);
       console.log('Deleted. Older backups may still hold a copy until they expire (BACKUP_KEEP_DAYS).');
       return 0;
     }
 
     case 'privacy:purge': {
-      console.log(`Removed ${purgeOldEmailLogs(db, config.retention.emailLogDays)} email log rows older than ${config.retention.emailLogDays} days.`);
+      const r = purgeExpiredPersonalData(db, config.retention);
+      console.log(`Removed ${r.emailLog} email log rows, ${r.unconfirmedSignups} unconfirmed signups and ${r.enquiries} old enquiries.`);
       return 0;
     }
 

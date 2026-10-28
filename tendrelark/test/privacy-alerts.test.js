@@ -7,6 +7,8 @@ import { requestSignup } from '../src/newsletter/subscribers.js';
 import { createEnquiry } from '../src/enquiries.js';
 import { freshDb, memoryMailer, startApp, testConfig } from './helpers.js';
 
+const SECRET = 'test-secret-test-secret-test-secret-1234';
+
 async function populated() {
   const config = testConfig();
   const db = freshDb(config);
@@ -39,7 +41,7 @@ test('an access request returns everything held for the address, in any capitali
 
 test('erasure removes one person completely and leaves everyone else alone', async () => {
   const { db } = await populated();
-  const counts = erasePersonalData(db, 'ana.silva@example.com');
+  const counts = erasePersonalData(db, 'ana.silva@example.com', SECRET);
   assert.deepEqual([counts.subscribers, counts.enquiries, counts.deliveries], [1, 1, 1]);
 
   assert.equal(db.prepare("SELECT COUNT(*) n FROM subscribers WHERE email = 'ana.silva@example.com'").get().n, 0);
@@ -57,7 +59,7 @@ test('erasure removes one person completely and leaves everyone else alone', asy
   assert.equal(db.prepare("SELECT COUNT(*) n FROM enquiries WHERE email = 'other@example.com'").get().n, 1);
   assert.equal(getMeta(db, 'erasure_requests_handled'), '1');
   assert.deepEqual(countPersonalData(findPersonalData(db, 'ana.silva@example.com')), { subscribers: 0, enquiries: 0, emailLog: 0, deliveries: 0 });
-  assert.equal(erasePersonalData(db, 'broken'), null);
+  assert.equal(erasePersonalData(db, 'broken', SECRET), null);
 });
 
 test('enquiry notifications keep no name in the email log subject', async () => {

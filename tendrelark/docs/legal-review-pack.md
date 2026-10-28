@@ -23,7 +23,7 @@ Who is the controller: the entity named by `LEGAL_ENTITY_NAME` and `LEGAL_ENTITY
 | Newsletter deliveries | which subscriber got which issue, success or failure | Do not send an issue twice; retry failures | With the subscriber record |
 | Server logs | request method, path, status code and duration. No IP address and no query string are written by the application | Fault finding | Set by the host (not decided yet) |
 | Rate limiting | client IP held in memory for up to an hour, never written to disk | Stop abuse of the forms | In memory only |
-| Backups | A copy of everything above, encrypted with AES-256-GCM | Recover from loss | 14 days on the server (`BACKUP_KEEP_DAYS`); the off-server copy period is not decided |
+| Backups | A copy of everything above, encrypted with AES-256-GCM | Recover from loss | 30 days on the server (`BACKUP_KEEP_DAYS`, proposed maximum); the off-server copy period is not decided |
 | Tender notices | Public information from TED. Notices name public buyers and may include business contact details the buyer chose to publish | The service itself | Stored indefinitely |
 
 Not collected: cookies, analytics, advertising identifiers, IP addresses in the database, payment data,

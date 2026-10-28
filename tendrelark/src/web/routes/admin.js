@@ -151,7 +151,7 @@ export function adminRoutes(app, ctx) {
 
   app.post('/admin/privacy/erase', post, (req, res) => {
     if (str(req.body.confirm) !== 'yes') return res.redirect(303, flashUrl('/admin/privacy', 'error', 'Tick the box to confirm. Nothing was deleted.'));
-    const counts = erasePersonalData(db, str(req.body.email));
+    const counts = erasePersonalData(db, str(req.body.email), config.appSecret);
     if (!counts) return res.redirect(303, flashUrl('/admin/privacy', 'error', 'That does not look like an email address.'));
     return res.redirect(303, flashUrl('/admin/privacy', 'ok', `Erased: ${counts.subscribers} newsletter record, ${counts.enquiries} enquiries, ${counts.deliveries} deliveries and ${counts.emailLog} email log rows.`));
   });

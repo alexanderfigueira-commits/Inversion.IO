@@ -190,4 +190,17 @@ export const migrations = [
       );
     `,
   },
+  {
+    version: 2,
+    name: 'erasure tombstones',
+    sql: `
+      -- Hashes of addresses erased on request, so an old backup that is restored can have those erasures applied
+      -- again. Only a keyed hash is kept, never the address, and erased_at stops a person who signed up again
+      -- later from being deleted by mistake.
+      CREATE TABLE erasures (
+        email_hash TEXT PRIMARY KEY,
+        erased_at  TEXT NOT NULL
+      );
+    `,
+  },
 ];

@@ -1,5 +1,5 @@
 import { getMeta, nowIso, setMeta, tx } from './db/index.js';
-import { normalizeEmail } from './lib/security.js';
+import { hmac, normalizeEmail } from './lib/security.js';
 
 // Everything the site stores about a person is keyed on their email address: the newsletter subscriber
 // record, any contact enquiries, and the email log. These functions answer an access request (export)
@@ -46,10 +46,11 @@ export function exportPersonalData(db, rawEmail, now = new Date()) {
 }
 
 /**
- * Deletes everything held about the address. The only trace kept is a count of how many erasure requests
- * were handled, with no address and no name, so the operator can show the process is used.
+ * Deletes everything held about the address. The only trace kept is a keyed hash of the address and the time
+ * (so erasures can be applied again after a backup restore) and a count of requests, never the address or name.
  */
-export function erasePersonalData(db, rawEmail) {
+export function erasePersonalData(db, rawEmail, secret) {
+  if (!secret) throw new Error('erasePersonalData needs the app secret to record the erasure.');
   const data = findPersonalData(db, rawEmail);
   if (!data) return null;
   const counts = countPersonalData(data);
@@ -57,6 +58,7 @@ export function erasePersonalData(db, rawEmail) {
     db.prepare('DELETE FROM subscribers WHERE email = ?').run(data.email); // deliveries go with it (cascade)
     db.prepare('DELETE FROM enquiries WHERE email = ?').run(data.email);
     db.prepare('DELETE FROM email_log WHERE lower(to_email) = ?').run(data.email);
+    db.prepare('INSERT INTO erasures (email_hash, erased_at) VALUES (?, ?) ON CONFLICT(email_hash) DO UPDATE SET erased_at = excluded.erased_at').run(erasureHash(secret, data.email), nowIso());
     setMeta(db, 'erasure_requests_handled', Number(getMeta(db, 'erasure_requests_handled') || 0) + 1);
     setMeta(db, 'last_erasure_at', nowIso());
   });
@@ -67,4 +69,44 @@ export function erasePersonalData(db, rawEmail) {
 export function purgeOldEmailLogs(db, days = 90, now = new Date()) {
   const cutoff = new Date(now.getTime() - days * 86_400_000).toISOString();
   return Number(db.prepare('DELETE FROM email_log WHERE created_at < ?').run(cutoff).changes);
+}
+
+/** Keyed hash of an address. Without the app secret it cannot be reversed by trying known addresses. */
+export const erasureHash = (secret, email) => hmac(secret, `erased:${email}`);
+
+/**
+ * Applies recorded erasures again. Run after restoring a backup, and at every start, so a person who asked to be
+ * erased does not come back with an old copy of the data. Rows created after the erasure (the person signing up
+ * again) are left alone.
+ */
+export function reapplyErasures(db, secret) {
+  const erased = new Map(db.prepare('SELECT email_hash, erased_at FROM erasures').all().map((r) => [r.email_hash, r.erased_at]));
+  if (!erased.size) return 0;
+  let removed = 0;
+  const check = (email, createdAt) => {
+    const at = erased.get(erasureHash(secret, String(email).toLowerCase()));
+    return at !== undefined && createdAt <= at;
+  };
+  tx(db, () => {
+    for (const r of db.prepare('SELECT id, email, created_at FROM subscribers').all()) {
+      if (check(r.email, r.created_at)) removed += Number(db.prepare('DELETE FROM subscribers WHERE id = ?').run(r.id).changes);
+    }
+    for (const r of db.prepare('SELECT id, email, created_at FROM enquiries').all()) {
+      if (check(r.email, r.created_at)) removed += Number(db.prepare('DELETE FROM enquiries WHERE id = ?').run(r.id).changes);
+    }
+    for (const r of db.prepare('SELECT id, to_email, created_at FROM email_log').all()) {
+      if (check(r.to_email, r.created_at)) removed += Number(db.prepare('DELETE FROM email_log WHERE id = ?').run(r.id).changes);
+    }
+  });
+  return removed;
+}
+
+/** Deletes signups never confirmed, and old enquiries, per the retention settings. Returns what was removed. */
+export function purgeExpiredPersonalData(db, retention, now = new Date()) {
+  const before = (days) => new Date(now.getTime() - days * 86_400_000).toISOString();
+  return {
+    emailLog: purgeOldEmailLogs(db, retention.emailLogDays, now),
+    unconfirmedSignups: Number(db.prepare("DELETE FROM subscribers WHERE status = 'pending' AND created_at < ?").run(before(retention.unconfirmedSignupDays)).changes),
+    enquiries: Number(db.prepare('DELETE FROM enquiries WHERE created_at < ?').run(before(retention.enquiryDays)).changes),
+  };
 }

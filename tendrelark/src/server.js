@@ -3,6 +3,7 @@ import { openDatabase, recordBoot, schemaVersion } from './db/index.js';
 import { seedSources } from './db/seed.js';
 import { createAlerter } from './lib/alerts.js';
 import { createMailer } from './lib/mailer.js';
+import { reapplyErasures } from './privacy.js';
 import { startScheduler } from './jobs/scheduler.js';
 import { createApp } from './web/app.js';
 
@@ -22,12 +23,14 @@ try {
 const db = openDatabase(config.databasePath);
 seedSources(db);
 const boot = recordBoot(db);
+const reapplied = reapplyErasures(db, config.appSecret);
 const mailer = createMailer(config, db, { log });
 
 log.info(`Database: ${config.databasePath} (schema v${schemaVersion(db)}, created ${boot.dbCreatedAt}, start #${boot.bootCount})`);
 if (config.production && (config.databasePath.startsWith('/tmp') || config.databasePath.startsWith(process.cwd()))) {
   log.error(`WARNING: the database is inside the app directory or /tmp (${config.databasePath}). On most hosts that disk is wiped on every deploy. Mount a persistent volume and point DATABASE_PATH at it.`);
 }
+if (reapplied) log.info(`Applied earlier erasure requests again: removed ${reapplied} rows that an older backup had brought back.`);
 if (mailer.mode === 'console') log.error('WARNING: SMTP_URL is not set. Confirmation emails, newsletters and the daily TED report are logged, not delivered.');
 if (config.backup.dir && !config.backup.passphrase) log.error('WARNING: BACKUP_DIR is set without BACKUP_PASSPHRASE, so backups are not encrypted. They contain subscriber email addresses.');
 if (!config.backup.dir && config.production) log.error('WARNING: no backups are configured. Set BACKUP_DIR (see docs/backups.md).');

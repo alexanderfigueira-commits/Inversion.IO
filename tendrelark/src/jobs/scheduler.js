@@ -1,6 +1,6 @@
 import { isBackupDue, runBackupJob } from '../db/backup.js';
 import { noAlerts } from '../lib/alerts.js';
-import { purgeOldEmailLogs } from '../privacy.js';
+import { purgeExpiredPersonalData } from '../privacy.js';
 import { verifySources } from '../sources/verify.js';
 import { isDailyRunDue, runDailyTedImport } from './daily-ted.js';
 
@@ -47,10 +47,10 @@ export function startScheduler({ config, db, mailer, log = console, alerter = no
 
   const purgeTick = () => {
     try {
-      const n = purgeOldEmailLogs(db, config.retention.emailLogDays);
-      if (n) log.info?.(`[privacy] removed ${n} email log rows older than ${config.retention.emailLogDays} days`);
+      const r = purgeExpiredPersonalData(db, config.retention);
+      if (r.emailLog || r.unconfirmedSignups || r.enquiries) log.info?.(`[privacy] removed ${r.emailLog} email log rows, ${r.unconfirmedSignups} unconfirmed signups, ${r.enquiries} old enquiries`);
     } catch (err) {
-      log.error?.(`[scheduler] email log purge failed: ${err.message}`);
+      log.error?.(`[scheduler] retention purge failed: ${err.message}`);
     }
   };
   timers.push(setTimeout(purgeTick, 90_000).unref(), setInterval(purgeTick, 6 * 3_600_000).unref());

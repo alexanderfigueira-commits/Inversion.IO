@@ -101,7 +101,8 @@ export function unsubscribe(db, config, token) {
   if (!sub) return false;
   if (sub.status !== 'unsubscribed') {
     const stamp = nowIso();
-    db.prepare("UPDATE subscribers SET status = 'unsubscribed', unsubscribed_at = ?, updated_at = ? WHERE id = ?").run(stamp, stamp, id);
+    // Keep only what suppression needs: the address and the date. The rest is dropped.
+    db.prepare("UPDATE subscribers SET status = 'unsubscribed', unsubscribed_at = ?, updated_at = ?, role = NULL, signup_source = NULL, confirm_token_hash = NULL WHERE id = ?").run(stamp, stamp, id);
   }
   return true;
 }

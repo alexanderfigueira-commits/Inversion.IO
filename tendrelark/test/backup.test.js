@@ -46,7 +46,7 @@ test('an encrypted backup restores to an identical database and hides its conten
 
   const target = path.join(tmp.dir, 'restored.db');
   const info = await restoreBackup({ file: b.file, to: target, passphrase: PASS });
-  assert.deepEqual([info.notices, info.subscribers, info.schemaVersion], [5, 1, 1]);
+  assert.deepEqual([info.notices, info.subscribers, info.schemaVersion], [5, 1, 2]);
   assert.equal(countIn(target, 'ted_notices'), 5);
   const restored = new DatabaseSync(target, { readOnly: true });
   assert.equal(restored.prepare("SELECT email FROM subscribers").get().email, 'secret.person@example.com');

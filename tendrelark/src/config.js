@@ -97,7 +97,11 @@ export function loadConfig(overrides = {}) {
       enabled: truthy(e.ENABLE_SCHEDULER),
       sourceIntervalMinutes: int(e.SOURCE_CHECK_INTERVAL_MINUTES, 1440),
     },
-    retention: { emailLogDays: Math.max(7, int(e.EMAIL_LOG_RETENTION_DAYS, 90)) },
+    retention: {
+      emailLogDays: Math.max(7, int(e.EMAIL_LOG_RETENTION_DAYS, 90)),
+      unconfirmedSignupDays: Math.max(3, int(e.RETENTION_UNCONFIRMED_DAYS, 30)),
+      enquiryDays: Math.max(30, int(e.RETENTION_ENQUIRY_DAYS, 365)),
+    },
     // Where operational alerts go, and how long to wait before sending another of the same kind.
     alerts: {
       to: e.ALERT_EMAIL || e.TED_REPORT_EMAIL || 'support@tendrelark.eu',
@@ -107,7 +111,7 @@ export function loadConfig(overrides = {}) {
     backup: {
       dir: e.BACKUP_DIR ? path.resolve(e.BACKUP_DIR) : '',
       passphrase: e.BACKUP_PASSPHRASE || '',
-      keepDays: Math.max(1, int(e.BACKUP_KEEP_DAYS, 14)),
+      keepDays: Math.max(1, int(e.BACKUP_KEEP_DAYS, 30)),
       atUtc: backupAt,
     },
     // The daily TED import: one scheduled run a day at dailyAtUtc, retried every retryIntervalMinutes

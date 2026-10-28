@@ -12,7 +12,7 @@ Set `BACKUP_DIR` and the running app takes a backup every night at `BACKUP_AT_UT
 2. It compresses it, and encrypts it with AES-256-GCM when `BACKUP_PASSPHRASE` is set.
 3. It **restores the finished file to a scratch copy and checks it**: integrity check, and the same number of
    notices and subscribers as the original. A backup that cannot be restored counts as a failure.
-4. It deletes backups older than `BACKUP_KEEP_DAYS` (default 14), always keeping the newest three.
+4. It deletes backups older than `BACKUP_KEEP_DAYS` (default 30), always keeping the newest three.
 5. It records the result. `/healthz` shows it, and `npm run check:production` fails if the last good backup is
    older than 36 hours or the latest attempt failed.
 
