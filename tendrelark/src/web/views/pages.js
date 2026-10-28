@@ -184,10 +184,10 @@ export function privacyPage({ config }) {
       <p>We use hosting and email delivery providers to run the site and send email. They process data on our behalf. We do not sell personal data.</p>
 
       <h2>How long we keep it</h2>
-      <p>Contact messages are kept while the conversation is active and for a reasonable period afterwards. Newsletter records are kept until you ask us to delete them.</p>
+      <p>Contact messages are kept while the conversation is active and for a reasonable period afterwards. Newsletter records are kept until you ask us to delete them. Technical email logs, which record that a message was sent to an address, are deleted automatically after ${config.retention.emailLogDays} days. We keep encrypted backups of the database for a limited time, so a record you asked us to delete can remain in a backup until that backup expires (${config.backup.keepDays} days on our own server).</p>
 
       <h2>Your rights</h2>
-      <p>You can ask us to access, correct, delete or restrict your data, to move it, or to stop using it. Write to <a href="mailto:${config.contact.email}">${config.contact.email}</a>. You can also complain to your data protection authority: the CNPD in Portugal, the CNPD in Luxembourg, or the Data Protection Authority (APD/GBA) in Belgium.</p>
+      <p>You can ask us to access, correct, delete or restrict your data, to move it, or to stop using it. We can send you a copy of everything we hold about your email address, and delete it on request. Write to <a href="mailto:${config.contact.email}">${config.contact.email}</a>. You can also complain to your data protection authority: the CNPD in Portugal, the CNPD in Luxembourg, or the Data Protection Authority (APD/GBA) in Belgium.</p>
     </div>
   </section>`;
   return layout({

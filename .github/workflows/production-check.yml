@@ -1,0 +1,34 @@
+name: Production check
+
+# Checks the live Tendrelark site from outside every 30 minutes, using only its public /healthz page.
+# It fails when the site is down, TED notices are not being stored, the last daily import did not complete,
+# or backups are stale. GitHub emails the people watching the repository when a run fails.
+#
+# It does nothing until you set a repository variable:
+#   Settings > Secrets and variables > Actions > Variables > New repository variable
+#   Name: TENDRELARK_URL     Value: https://www.tendrelark.eu
+#
+# Scheduled workflows only run from the repository's default branch, so merge this there first.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: ${{ vars.TENDRELARK_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check the live site
+        env:
+          SITE: ${{ vars.TENDRELARK_URL }}
+        run: node tendrelark/bin/check-production.js "$SITE"

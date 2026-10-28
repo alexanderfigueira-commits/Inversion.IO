@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import { loadConfig } from '../src/config.js';
+import { countPersonalData, erasePersonalData, exportPersonalData, findPersonalData, purgeOldEmailLogs } from '../src/privacy.js';
 import { createBackup, listBackups, pruneBackups, restoreBackup, verifyBackup } from '../src/db/backup.js';
 import { checkEmailDns } from '../src/lib/dns-check.js';
 import { downloadResource, fetchDatasetMeta, judgeFreshness, pickResource, renderDatasetReport, scanCsvDates, scanJsonDates } from '../src/sources/base-dataset.js';
@@ -41,6 +42,10 @@ const HELP = `Tendrelark command line
   db:verify-backup --from FILE    Restore a backup to a scratch file and check it opens and matches
   db:restore --from FILE --to PATH [--force]
                                   Restore a backup into a new database file (stop the app first if replacing the live one)
+  privacy:export --email ADDRESS  Everything held about an address, as JSON (for an access request)
+  privacy:erase --email ADDRESS --yes
+                                  Delete everything held about an address (shows what will go first without --yes)
+  privacy:purge                   Delete email log rows older than EMAIL_LOG_RETENTION_DAYS
   mail:url --host H --port P --user U   Build a correctly encoded SMTP_URL (password from SMTP_PASSWORD or --password)
   mail:test [--to ADDRESS]        Connect to SMTP_URL, log in and send a test email, with plain language errors
   dataset:base [--download] [--max-mb N]
@@ -224,6 +229,38 @@ async function main() {
       const list = dir ? listBackups(dir) : [];
       if (!list.length) console.log(`No backups found${dir ? ` in ${dir}` : '. Set BACKUP_DIR or pass --dir'}.`);
       for (const b of list) console.log(`${b.takenAt}  ${String(Math.round(b.bytes / 1024)).padStart(8)} KB  ${b.encrypted ? 'encrypted    ' : 'not encrypted'}  ${b.name}`);
+      return 0;
+    }
+
+    case 'privacy:export': {
+      const data = exportPersonalData(db, typeof f.email === 'string' ? f.email : '');
+      if (!data) {
+        console.error('Pass --email someone@example.com');
+        return 1;
+      }
+      console.log(JSON.stringify(data, null, 2));
+      return 0;
+    }
+
+    case 'privacy:erase': {
+      const found = findPersonalData(db, typeof f.email === 'string' ? f.email : '');
+      if (!found) {
+        console.error('Pass --email someone@example.com');
+        return 1;
+      }
+      const counts = countPersonalData(found);
+      console.log(`Held for ${found.email}: ${counts.subscribers} subscriber record, ${counts.enquiries} enquiries, ${counts.deliveries} newsletter deliveries, ${counts.emailLog} email log rows.`);
+      if (!f.yes) {
+        console.log('Nothing deleted. Run again with --yes to delete all of it. This cannot be undone.');
+        return 0;
+      }
+      erasePersonalData(db, found.email);
+      console.log('Deleted. Older backups may still hold a copy until they expire (BACKUP_KEEP_DAYS).');
+      return 0;
+    }
+
+    case 'privacy:purge': {
+      console.log(`Removed ${purgeOldEmailLogs(db, config.retention.emailLogDays)} email log rows older than ${config.retention.emailLogDays} days.`);
       return 0;
     }
 

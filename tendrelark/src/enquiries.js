@@ -39,7 +39,7 @@ export async function createEnquiry(db, mailer, config, input) {
     await mailer.send({
       to: config.contact.email,
       kind: 'enquiry_notification',
-      subject: `New enquiry from ${oneLine(name)}`,
+      subject: 'New website enquiry', // no name here: the subject is kept in the email log
       text: `Name: ${name}\nEmail: ${email}\nCompany: ${company ?? '-'}\nInterest: ${INTEREST_LABELS[input.interest] ?? 'Something else'}\n\n${message}\n`,
       headers: { 'Reply-To': `${oneLine(name).replace(/[<>",]/g, '')} <${email}>` },
     });

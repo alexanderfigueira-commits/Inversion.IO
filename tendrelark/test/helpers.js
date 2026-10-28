@@ -6,6 +6,7 @@ import path from 'node:path';
 import { loadConfig } from '../src/config.js';
 import { openDatabase } from '../src/db/index.js';
 import { seedSources } from '../src/db/seed.js';
+import { createAlerter } from '../src/lib/alerts.js';
 import { createMailer } from '../src/lib/mailer.js';
 import { formToken, hmac } from '../src/lib/security.js';
 import { recordCheck } from '../src/sources/verify.js';
@@ -134,7 +135,8 @@ export async function startApp(overrides = {}) {
   const config = { ...testConfig({ ADMIN_PASSWORD: 'correct horse battery', ...overrides }), quietLogs: true };
   const db = freshDb(config);
   const mailer = memoryMailer(config, db);
-  const app = createApp({ config, db, mailer, log: { info() {}, error() {} } });
+  const alerter = createAlerter({ config, mailer, log: { info() {}, error() {} } });
+  const app = createApp({ config, db, mailer, log: { info() {}, error() {} }, alerter });
   const server = await new Promise((resolve) => {
     const s = app.listen(0, '127.0.0.1', () => resolve(s));
   });
@@ -153,7 +155,7 @@ export async function startApp(overrides = {}) {
   };
 
   return {
-    config, db, mailer, base,
+    config, db, mailer, base, alerter,
     get: (path, opts) => call('GET', path, opts),
     post: (path, form, opts = {}) => call('POST', path, { ...opts, form }),
     /** A form token old enough to pass the "not a script" timing check. */

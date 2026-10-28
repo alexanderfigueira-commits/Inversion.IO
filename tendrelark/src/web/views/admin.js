@@ -7,7 +7,7 @@ import { retrievalPill, statusPill } from '../components.js';
 import { contentParagraphs } from '../components.js';
 
 function adminShell({ config, path, title, body }) {
-  const wrapped = html`<div class="admin-bar"><div class="container">Admin &middot; <a href="/admin">Dashboard</a> &middot; <a href="/admin/subscribers">Subscribers</a> &middot; <a href="/">View site</a></div></div>${body}`;
+  const wrapped = html`<div class="admin-bar"><div class="container">Admin &middot; <a href="/admin">Dashboard</a> &middot; <a href="/admin/subscribers">Subscribers</a> &middot; <a href="/admin/privacy">Data requests</a> &middot; <a href="/">View site</a></div></div>${body}`;
   return layout({ config, path, title, description: 'Tendrelark admin', body: wrapped, noindex: true });
 }
 
@@ -196,4 +196,37 @@ export function adminSubscribers({ config, subscribers, counts }) {
     </table></div>
   </div></section>`;
   return adminShell({ config, path: '/admin/subscribers', title: 'Subscribers', body });
+}
+
+/** Handle an access or erasure request for one email address. */
+export function adminPrivacy({ config, csrf, email, found, counts, flash: message }) {
+  const nothing = found && !counts.subscribers && !counts.enquiries && !counts.emailLog;
+  const body = html`<section class="section"><div class="container narrow admin-page">
+    <h1>Data requests</h1>
+    <p class="muted">When someone asks what you hold about them, or asks you to delete it. Everything the site stores about a person is tied to their email address.</p>
+    ${message ? flash(message.kind, message.text) : ''}
+    <form class="form" method="get" action="/admin/privacy">
+      <div class="field"><label for="email">Email address of the person</label><input id="email" type="text" inputmode="email" name="email" value="${email ?? ''}" maxlength="254" required></div>
+      <div><button class="btn" type="submit">Look up</button></div>
+    </form>
+    ${email && !found ? flash('error', 'That does not look like an email address.') : ''}
+    ${found
+      ? html`<h2>Held for ${found.email}</h2>
+        ${nothing
+          ? html`<p>Nothing is held for this address.</p>`
+          : html`<dl class="stats">
+              <div class="stat"><dt>Newsletter record</dt><dd>${counts.subscribers}</dd></div>
+              <div class="stat"><dt>Contact enquiries</dt><dd>${counts.enquiries}</dd></div>
+              <div class="stat"><dt>Newsletter deliveries</dt><dd>${counts.deliveries}</dd></div>
+              <div class="stat"><dt>Email log rows</dt><dd>${counts.emailLog}</dd></div>
+            </dl>
+            <form class="form" method="post" action="/admin/privacy/export">${csrfField(csrf)}<input type="hidden" name="email" value="${found.email}"><div><button class="btn btn-secondary" type="submit">Download a copy (JSON)</button></div></form>
+            <form class="form" method="post" action="/admin/privacy/erase">${csrfField(csrf)}<input type="hidden" name="email" value="${found.email}">
+              <div class="field"><label class="check" for="confirm"><input id="confirm" type="checkbox" name="confirm" value="yes" required><span>Delete all of this. It cannot be undone.</span></label></div>
+              <div><button class="btn btn-danger" type="submit">Erase everything</button></div>
+            </form>
+            <p class="muted small">Encrypted backups may keep an older copy until they expire. Say so when you reply to the person.</p>`}`
+      : ''}
+  </div></section>`;
+  return adminShell({ config, path: '/admin/privacy', title: 'Data requests', body });
 }

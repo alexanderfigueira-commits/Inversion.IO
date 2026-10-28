@@ -97,6 +97,12 @@ export function loadConfig(overrides = {}) {
       enabled: truthy(e.ENABLE_SCHEDULER),
       sourceIntervalMinutes: int(e.SOURCE_CHECK_INTERVAL_MINUTES, 1440),
     },
+    retention: { emailLogDays: Math.max(7, int(e.EMAIL_LOG_RETENTION_DAYS, 90)) },
+    // Where operational alerts go, and how long to wait before sending another of the same kind.
+    alerts: {
+      to: e.ALERT_EMAIL || e.TED_REPORT_EMAIL || 'support@tendrelark.eu',
+      throttleMinutes: Math.max(1, int(e.ALERT_THROTTLE_MINUTES, 15)),
+    },
     // Nightly backups of the database. Off unless BACKUP_DIR is set. With a passphrase they are encrypted.
     backup: {
       dir: e.BACKUP_DIR ? path.resolve(e.BACKUP_DIR) : '',

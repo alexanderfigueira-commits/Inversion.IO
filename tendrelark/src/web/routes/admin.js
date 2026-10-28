@@ -9,7 +9,8 @@ import { listSubscribers, subscriberCounts } from '../../newsletter/subscribers.
 import { ingestTed, latestRuns } from '../../ted/ingest.js';
 import { listSources, verifySources } from '../../sources/verify.js';
 import { tedStats } from '../../tenders.js';
-import { adminDashboard, adminIssueForm, adminSubscribers } from '../views/admin.js';
+import { countPersonalData, erasePersonalData, exportPersonalData, findPersonalData } from '../../privacy.js';
+import { adminDashboard, adminIssueForm, adminPrivacy, adminSubscribers } from '../views/admin.js';
 import { notFoundPage } from '../views/pages.js';
 import { str } from './public.js';
 
@@ -132,6 +133,27 @@ export function adminRoutes(app, ctx) {
     const header = ['email', 'status', 'role', 'signed_up_from', 'submissions', 'first_signed_up', 'confirmed_at', 'unsubscribed_at'];
     const rows = listSubscribers(db, { limit: 100_000 }).map((s) => [s.email, s.status, s.role, s.signup_source, s.submit_count, s.created_at, s.confirmed_at, s.unsubscribed_at].map(cell).join(','));
     res.set('Cache-Control', 'no-store').type('text/csv').attachment('tendrelark-subscribers.csv').send(`${header.join(',')}\n${rows.join('\n')}\n`);
+  });
+
+  // Data requests: look up, export and erase everything held for one email address.
+  app.get('/admin/privacy', guard, (req, res) => {
+    const email = str(req.query.email).trim().slice(0, 254);
+    const found = email ? findPersonalData(db, email) : null;
+    send(res, adminPrivacy({ config, csrf: csrfToken, email, found, counts: found ? countPersonalData(found) : null, flash: readFlash(req) }));
+  });
+
+  app.post('/admin/privacy/export', post, (req, res) => {
+    const data = exportPersonalData(db, str(req.body.email));
+    if (!data) return res.redirect(303, flashUrl('/admin/privacy', 'error', 'That does not look like an email address.'));
+    // A fixed file name, so nothing from the address can end up in a header.
+    return res.set('Cache-Control', 'no-store').type('application/json').attachment('personal-data.json').send(JSON.stringify(data, null, 2));
+  });
+
+  app.post('/admin/privacy/erase', post, (req, res) => {
+    if (str(req.body.confirm) !== 'yes') return res.redirect(303, flashUrl('/admin/privacy', 'error', 'Tick the box to confirm. Nothing was deleted.'));
+    const counts = erasePersonalData(db, str(req.body.email));
+    if (!counts) return res.redirect(303, flashUrl('/admin/privacy', 'error', 'That does not look like an email address.'));
+    return res.redirect(303, flashUrl('/admin/privacy', 'ok', `Erased: ${counts.subscribers} newsletter record, ${counts.enquiries} enquiries, ${counts.deliveries} deliveries and ${counts.emailLog} email log rows.`));
   });
 
   // Newsletter issues. Drafts live here and only here until they are published.

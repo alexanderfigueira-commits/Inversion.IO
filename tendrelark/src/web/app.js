@@ -1,4 +1,5 @@
 import express from 'express';
+import { describeRequestError, noAlerts } from '../lib/alerts.js';
 import { createRateLimiter } from '../lib/security.js';
 import { publicRoutes } from './routes/public.js';
 import { newsletterRoutes } from './routes/newsletter.js';
@@ -19,7 +20,7 @@ const CSP = [
 ].join('; ');
 
 /** Builds the Express app. Everything it needs is passed in, so tests can run it on a temp database. */
-export function createApp({ config, db, mailer, log = console }) {
+export function createApp({ config, db, mailer, log = console, alerter = noAlerts }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.trustProxy) app.set('trust proxy', config.trustProxy);
@@ -72,9 +73,11 @@ export function createApp({ config, db, mailer, log = console }) {
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
+    const status = err.status && err.status < 500 ? err.status : 500;
     log.error?.(`Unhandled error on ${req.method} ${req.path}: ${err.stack || err}`);
+    if (status >= 500) alerter.alert('http-500', `Server error on ${req.method} ${req.path}`, describeRequestError(req, err));
     if (res.headersSent) return;
-    res.status(err.status && err.status < 500 ? err.status : 500).type('html').send(errorPage({ config, path: req.path }).toString());
+    res.status(status).type('html').send(errorPage({ config, path: req.path }).toString());
   });
 
   return app;
