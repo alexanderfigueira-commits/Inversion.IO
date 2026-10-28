@@ -138,30 +138,62 @@ scheduler live in memory.
 
 All settings are in `.env.example`.
 
+## Operator commands
+
+Run with `npm run NAME -- OPTIONS`. `npm run` with no name lists them all. In a container, prefix with
+`docker compose exec app`.
+
+| Command | What it does |
+| --- | --- |
+| `ted:first-run` | The first real run against TED: probe, import, compare with TED's counts, measure data quality, save a report |
+| `ted:daily` | One full daily cycle: import, retry for up to an hour, email the log |
+| `ted:probe`, `ted:ingest`, `ted:reconcile` | The individual steps |
+| `sources:verify` | Check that every source portal is reachable |
+| `dataset:base` | Check the Portal BASE open dataset on dados.gov.pt and the newest notice date in it |
+| `mail:url`, `mail:test` | Build the SMTP setting, and test it |
+| `dns:check` | Check SPF, DKIM and DMARC for the domain |
+| `db:backup`, `db:backups`, `db:verify-backup`, `db:restore` | Verified, encrypted backups and restore |
+| `privacy:export`, `privacy:erase`, `privacy:purge` | Data requests and log retention |
+| `newsletter:build`, `newsletter:publish`, `newsletter:send` | Newsletter issues from the command line |
+| `check:production` | Check a live site from outside. `--save` and `--compare` prove persistence |
+| `db:check` | Print what the database holds |
+
+## Guides
+
+- [`docs/deploy.md`](docs/deploy.md): put the site live on one server with HTTPS, and prove the data survives a redeploy
+- [`docs/email.md`](docs/email.md): outgoing email, testing it, and the DNS records that keep mail out of spam
+- [`docs/backups.md`](docs/backups.md): nightly encrypted backups, copying them off the server, the restore drill
+- [`docs/monitoring.md`](docs/monitoring.md): alerts, the outside check, and how to test that they reach you
+- [`docs/legal-review-pack.md`](docs/legal-review-pack.md): facts and questions for a lawyer
+- [`docs/outreach/`](docs/outreach/): ready to send emails to BOSA, IMPIC and the Luxembourg portal about their data
+
 ## Things only you can supply or confirm
 
 - **The brand photo.** Put the paper bird photo at `public/img/logo-photo.webp` (or `.jpg`, `.jpeg`, `.png`).
   It appears at the lower left of the home page, under the newsletter text. Until the file exists, the page shows
   the Tendrelark mark in the same frame.
-- **SMTP.** Nothing is emailed without `SMTP_URL`: signup confirmations, the daily TED report and the newsletter.
+- **SMTP.** Nothing is emailed without `SMTP_URL`: signup confirmations, the daily TED report, alerts and the newsletter. See `docs/email.md`.
 - **Legal details.** Set `LEGAL_ENTITY_NAME` and `LEGAL_ENTITY_DETAILS`. Have the privacy page reviewed by a
   lawyer. It is a plain language draft, not legal advice.
 - **Contact and sender address.** `CONTACT_EMAIL` and the "From" address in `MAIL_FROM` both default to `support@tendrelark.eu`. Your SMTP provider must be allowed to send as that address.
 - **A live check of the TED API.** The client follows TED's published request and response shape, and the tests
-  run against a stand in server for it. Run `npm run ted:probe` once from a machine that can reach TED to
-  confirm the real thing agrees.
+  run against a stand in server for it. Run `npm run ted:first-run` once from a machine that can reach TED. It
+  imports the last 30 days and writes a report you can paste into the GitHub issue.
 
 ## Layout
 
 ```
 src/config.js            settings, with fail fast checks for production
-src/db/                  connection, migrations, source directory seed
+src/db/                  connection, migrations, source directory seed, backups
 src/ted/                 API client, normalisation, ingestion, reconcile, probe
 src/jobs/                daily TED cycle and the scheduler
+src/privacy.js           export and erase everything held for an email address
 src/sources/             reachability checks, coverage rules, link validation
 src/newsletter/          subscribers, issues, emailing
 src/web/                 app, routes, views, stylesheet lives in public/
 bin/cli.js               operator commands (npm run ... shows them)
 bin/check-production.js  outside check of a running site
+deploy/                  Docker Compose and Caddy files for one server
+docs/                    runbooks: deploy, email, backups, monitoring, legal pack, outreach
 test/                    node:test suite
 ```

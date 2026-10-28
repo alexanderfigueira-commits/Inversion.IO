@@ -1,0 +1,14 @@
+# Caddy gets and renews HTTPS certificates by itself, as long as both names below point at this server.
+{
+	email support@tendrelark.eu
+}
+
+www.tendrelark.eu {
+	encode zstd gzip
+	reverse_proxy app:3000
+}
+
+# The site's canonical address is www. Send the bare domain there.
+tendrelark.eu {
+	redir https://www.tendrelark.eu{uri} permanent
+}

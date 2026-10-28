@@ -8,3 +8,4 @@ data/
 !.env.example
 .scratch/
 ted-first-run-report.txt
+deploy/production.env
