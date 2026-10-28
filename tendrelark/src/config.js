@@ -46,6 +46,10 @@ export function loadConfig(overrides = {}) {
     problems.push('SITE_URL must start with https:// in production.');
   }
 
+  const backupAt = e.BACKUP_AT_UTC || '03:00';
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(backupAt)) problems.push('BACKUP_AT_UTC must look like 03:00 (24 hour clock, UTC).');
+  if (e.BACKUP_PASSPHRASE && e.BACKUP_PASSPHRASE.length < 12) problems.push('BACKUP_PASSPHRASE must be at least 12 characters. Backups contain subscriber email addresses.');
+
   const dailyAt = e.TED_DAILY_AT_UTC || '06:00';
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(dailyAt)) problems.push('TED_DAILY_AT_UTC must look like 06:00 (24 hour clock, UTC).');
 
@@ -92,6 +96,13 @@ export function loadConfig(overrides = {}) {
     scheduler: {
       enabled: truthy(e.ENABLE_SCHEDULER),
       sourceIntervalMinutes: int(e.SOURCE_CHECK_INTERVAL_MINUTES, 1440),
+    },
+    // Nightly backups of the database. Off unless BACKUP_DIR is set. With a passphrase they are encrypted.
+    backup: {
+      dir: e.BACKUP_DIR ? path.resolve(e.BACKUP_DIR) : '',
+      passphrase: e.BACKUP_PASSPHRASE || '',
+      keepDays: Math.max(1, int(e.BACKUP_KEEP_DAYS, 14)),
+      atUtc: backupAt,
     },
     // The daily TED import: one scheduled run a day at dailyAtUtc, retried every retryIntervalMinutes
     // for up to retryWindowMinutes until a run completes, then a log email to reportTo.

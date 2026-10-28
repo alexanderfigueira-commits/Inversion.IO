@@ -38,7 +38,7 @@ try {
   process.exit(1);
 }
 
-const { database, ted, sources } = health;
+const { database, ted, sources, backup } = health;
 console.log(`Checked ${base} at ${health.time}`);
 console.log(`Database created:      ${database.createdAt}`);
 console.log(`Starts recorded:       ${database.startCount}`);
@@ -50,6 +50,7 @@ console.log(`Last success:          ${ted.lastSuccessAt ?? 'never'}${ted.hoursSi
 console.log(`Scheduler:             ${ted.schedulerEnabled ? 'on' : 'off'}`);
 const cycle = ted.dailyCycle;
 console.log(`Daily import cycle:    ${cycle ? `${cycle.date} ${cycle.outcome}, ${cycle.attempts} attempt(s), report ${cycle.reportEmailed ? 'emailed' : 'NOT emailed'}` : 'none recorded yet'}`);
+console.log(`Backups:               ${backup?.configured ? `${backup.encrypted ? 'encrypted' : 'NOT encrypted'}, last good ${backup.lastSuccessAt ?? 'never'}${backup.hoursSinceLastSuccess != null ? ` (${backup.hoursSinceLastSuccess} h ago)` : ''}` : 'not configured'}`);
 console.log(`Sources:               ${sources.map((s) => `${s.slug}=${s.status}`).join(', ')}`);
 
 if (ted.noticesStored === 0) fail('No TED notices are stored. Ingestion has not run, or its writes are not reaching the database.');
@@ -58,6 +59,12 @@ else if (ted.hoursSinceLastSuccess > maxHours) fail(`The last successful ingesti
 if (ted.lastRun && ['failed', 'empty'].includes(ted.lastRun.status)) fail(`The most recent ingestion run ${ted.lastRun.status === 'empty' ? 'returned no notices' : 'failed'}.`);
 if (cycle && cycle.outcome !== 'done') fail(`The daily import on ${cycle.date} did not complete after ${cycle.attempts} attempt(s).`);
 if (cycle && !cycle.reportEmailed) fail(`The daily TED report for ${cycle.date} was not emailed (SMTP not configured, or sending failed).`);
+if (backup?.configured) {
+  if (!backup.lastSuccessAt) fail('Backups are configured but none has succeeded yet.');
+  else if (backup.hoursSinceLastSuccess > 36) fail(`The last good backup was ${backup.hoursSinceLastSuccess} hours ago.`);
+  if (backup.last && !backup.last.ok) fail(`The latest backup attempt failed: ${backup.last.error}`);
+  if (!backup.encrypted) console.log('Note: backups are not encrypted. Set BACKUP_PASSPHRASE, because they contain subscriber email addresses.');
+} else console.log('Note: no backups are configured. Set BACKUP_DIR (see docs/backups.md).');
 if (!ted.schedulerEnabled) console.log('Note: the in-process scheduler is off, so something else must run ingestion.');
 
 if (comparePath) {

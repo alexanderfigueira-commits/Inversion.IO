@@ -28,6 +28,8 @@ if (config.production && (config.databasePath.startsWith('/tmp') || config.datab
   log.error(`WARNING: the database is inside the app directory or /tmp (${config.databasePath}). On most hosts that disk is wiped on every deploy. Mount a persistent volume and point DATABASE_PATH at it.`);
 }
 if (mailer.mode === 'console') log.error('WARNING: SMTP_URL is not set. Confirmation emails, newsletters and the daily TED report are logged, not delivered.');
+if (config.backup.dir && !config.backup.passphrase) log.error('WARNING: BACKUP_DIR is set without BACKUP_PASSPHRASE, so backups are not encrypted. They contain subscriber email addresses.');
+if (!config.backup.dir && config.production) log.error('WARNING: no backups are configured. Set BACKUP_DIR (see docs/backups.md).');
 if (!config.admin.password) log.info('Admin area is off (set ADMIN_PASSWORD to enable /admin).');
 
 const app = createApp({ config, db, mailer, log });

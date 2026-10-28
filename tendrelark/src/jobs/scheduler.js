@@ -1,3 +1,4 @@
+import { isBackupDue, runBackupJob } from '../db/backup.js';
 import { verifySources } from '../sources/verify.js';
 import { isDailyRunDue, runDailyTedImport } from './daily-ted.js';
 
@@ -27,6 +28,18 @@ export function startScheduler({ config, db, mailer, log = console }) {
     }
   };
   timers.push(setTimeout(tedTick, 30_000).unref(), setInterval(tedTick, 60_000).unref());
+
+  let backupRunning = false;
+  const backupTick = async () => {
+    if (backupRunning || !isBackupDue(db, config)) return;
+    backupRunning = true;
+    try {
+      await runBackupJob({ db, config, log: (m) => log.info?.(`[backup] ${m}`) });
+    } finally {
+      backupRunning = false;
+    }
+  };
+  timers.push(setTimeout(backupTick, 45_000).unref(), setInterval(backupTick, 60_000).unref());
 
   const sourceTick = async () => {
     try {

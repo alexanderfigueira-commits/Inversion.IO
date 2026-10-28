@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import { loadConfig } from '../src/config.js';
+import { createBackup, listBackups, pruneBackups, restoreBackup, verifyBackup } from '../src/db/backup.js';
 import { checkEmailDns } from '../src/lib/dns-check.js';
 import { downloadResource, fetchDatasetMeta, judgeFreshness, pickResource, renderDatasetReport, scanCsvDates, scanJsonDates } from '../src/sources/base-dataset.js';
 import { buildSmtpUrl, describeSmtpUrl, redactSmtpUrl } from '../src/lib/smtp-url.js';
@@ -35,6 +36,11 @@ const HELP = `Tendrelark command line
 
   migrate                         Create or update the database schema and seed the source list
   db:check                        Print what the database holds (use after a deploy to prove persistence)
+  db:backup [--dir D]             Take a verified, compressed (and encrypted if BACKUP_PASSPHRASE is set) backup now
+  db:backups [--dir D]            List backups in the folder
+  db:verify-backup --from FILE    Restore a backup to a scratch file and check it opens and matches
+  db:restore --from FILE --to PATH [--force]
+                                  Restore a backup into a new database file (stop the app first if replacing the live one)
   mail:url --host H --port P --user U   Build a correctly encoded SMTP_URL (password from SMTP_PASSWORD or --password)
   mail:test [--to ADDRESS]        Connect to SMTP_URL, log in and send a test email, with plain language errors
   dataset:base [--download] [--max-mb N]
@@ -92,6 +98,25 @@ if (command === 'dns:check') {
   }
 }
 
+if (command === 'db:verify-backup' || command === 'db:restore') {
+  const cfg = loadConfig();
+  try {
+    if (typeof earlyFlags.from !== 'string') throw new Error('Pass --from path/to/backup.db.gz.enc');
+    if (command === 'db:verify-backup') {
+      const info = await verifyBackup(earlyFlags.from, cfg.backup.passphrase);
+      console.log(`OK. The backup restores and passes its integrity check: ${info.notices} TED notices, ${info.subscribers} subscribers, ${info.issues} issues, schema v${info.schemaVersion}.`);
+    } else {
+      if (typeof earlyFlags.to !== 'string') throw new Error('Pass --to path/to/new.db');
+      const info = await restoreBackup({ file: earlyFlags.from, to: earlyFlags.to, passphrase: cfg.backup.passphrase, force: Boolean(earlyFlags.force) });
+      console.log(`Restored to ${earlyFlags.to}: ${info.notices} TED notices, ${info.subscribers} subscribers, ${info.issues} issues, schema v${info.schemaVersion}.`);
+      console.log('Point DATABASE_PATH at it and start the app. Then run: npm run check:production');
+    }
+    process.exit(0);
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+}
 if (command === 'dataset:base') {
   try {
     const meta = await fetchDatasetMeta();
@@ -114,7 +139,7 @@ if (command === 'dataset:base') {
     console.log('Paste this into the Portugal issue on GitHub (#9) and record the decision.');
     process.exit(freshness.level === 'stale' || freshness.level === 'unknown' ? 1 : 0);
   } catch (err) {
-    console.error(`Could not check the dataset: ${err.message}`);
+    console.error(`Could not check the dataset: ${err.message}${err.cause?.code ? ` (${err.cause.code}). Check this machine can reach dados.gov.pt.` : ''}`);
     process.exit(1);
   }
 }
@@ -178,6 +203,28 @@ async function main() {
     case 'sources:verify': {
       const results = await verifySources(db, { log });
       return results.some((r) => r.status === 'unreachable') ? 1 : 0;
+    }
+
+    case 'db:backup': {
+      const dir = typeof f.dir === 'string' ? f.dir : config.backup.dir;
+      if (!dir) {
+        console.error('No backup folder. Set BACKUP_DIR or pass --dir /path/to/backups.');
+        return 1;
+      }
+      if (!config.backup.passphrase) console.log('Note: BACKUP_PASSPHRASE is not set, so this backup is NOT encrypted. It contains subscriber email addresses.');
+      const r = await createBackup(db, { dir, passphrase: config.backup.passphrase });
+      const removed = pruneBackups(dir, { keepDays: config.backup.keepDays });
+      console.log(`Backup written: ${r.file}\n  ${Math.round(r.bytes / 1024)} KB, ${r.encrypted ? 'encrypted' : 'not encrypted'}.\n  Verified by restoring it: ${r.notices} TED notices, ${r.subscribers} subscribers, ${r.issues} issues.${removed.length ? `\n  Removed ${removed.length} backups older than ${config.backup.keepDays} days.` : ''}`);
+      console.log('Now copy the folder somewhere off this server. See docs/backups.md.');
+      return 0;
+    }
+
+    case 'db:backups': {
+      const dir = typeof f.dir === 'string' ? f.dir : config.backup.dir;
+      const list = dir ? listBackups(dir) : [];
+      if (!list.length) console.log(`No backups found${dir ? ` in ${dir}` : '. Set BACKUP_DIR or pass --dir'}.`);
+      for (const b of list) console.log(`${b.takenAt}  ${String(Math.round(b.bytes / 1024)).padStart(8)} KB  ${b.encrypted ? 'encrypted    ' : 'not encrypted'}  ${b.name}`);
+      return 0;
     }
 
     case 'mail:test': {

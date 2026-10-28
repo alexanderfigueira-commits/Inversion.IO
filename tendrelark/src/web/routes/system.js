@@ -1,3 +1,4 @@
+import { readBackupStatus } from '../../db/backup.js';
 import { getMeta, schemaVersion } from '../../db/index.js';
 import { LAST_CYCLE_KEY } from '../../jobs/daily-ted.js';
 import { xml } from '../../lib/html.js';
@@ -45,6 +46,7 @@ export function buildHealth(db, config, now = new Date()) {
       schedulerEnabled: config.scheduler.enabled,
       dailyCycle: parseCycle(getMeta(db, LAST_CYCLE_KEY)),
     },
+    backup: (({ configured, encrypted, last, lastSuccessAt, hoursSinceLastSuccess }) => ({ configured, encrypted, last, lastSuccessAt, hoursSinceLastSuccess }))(readBackupStatus(db, config, now)),
     sources: listSources(db).map((s) => ({ slug: s.slug, status: effectiveStatus(s), lastCheckedAt: s.last_checked_at, lastVerifiedAt: s.last_verified_at })),
   };
 }
