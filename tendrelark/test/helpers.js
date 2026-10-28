@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import net from 'node:net';
 import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
@@ -161,6 +162,80 @@ export async function startApp(overrides = {}) {
     close: () => new Promise((resolve) => {
       server.closeAllConnections?.();
       server.close(resolve);
+    }),
+  };
+}
+
+/**
+ * A tiny SMTP server for tests. It speaks just enough of the protocol (EHLO, AUTH PLAIN, MAIL, RCPT,
+ * DATA, QUIT) to prove the mailer really connects, logs in and delivers, without any real mail server.
+ */
+export async function startSmtpStub({ user = 'support@tendrelark.eu', pass = 'secret' } = {}) {
+  const messages = [];
+  const server = net.createServer((socket) => {
+    socket.setEncoding('utf8');
+    let buf = '';
+    let inData = false;
+    const reply = (line) => socket.write(`${line}\r\n`);
+    reply('220 stub ESMTP ready');
+    socket.on('error', () => {});
+    socket.on('data', (chunk) => {
+      buf += chunk;
+      for (;;) {
+        if (inData) {
+          const end = buf.indexOf('\r\n.\r\n');
+          if (end === -1) return;
+          messages.push(buf.slice(0, end));
+          buf = buf.slice(end + 5);
+          inData = false;
+          reply('250 2.0.0 queued');
+          continue;
+        }
+        const i = buf.indexOf('\r\n');
+        if (i === -1) return;
+        const line = buf.slice(0, i);
+        buf = buf.slice(i + 2);
+        const [cmd, ...rest] = line.split(' ');
+        switch (cmd.toUpperCase()) {
+          case 'EHLO':
+          case 'HELO':
+            socket.write('250-stub\r\n250-AUTH PLAIN\r\n250 8BITMIME\r\n');
+            break;
+          case 'AUTH': {
+            const [, token = ''] = rest;
+            const [, u, p] = Buffer.from(token, 'base64').toString('utf8').split('\0');
+            if (u === user && p === pass) reply('235 2.7.0 Authentication successful');
+            else reply('535 5.7.8 Authentication credentials invalid');
+            break;
+          }
+          case 'MAIL':
+          case 'RCPT':
+          case 'RSET':
+          case 'NOOP':
+            reply('250 OK');
+            break;
+          case 'DATA':
+            inData = true;
+            reply('354 go ahead');
+            break;
+          case 'QUIT':
+            reply('221 bye');
+            socket.end();
+            break;
+          default:
+            reply('502 not implemented');
+        }
+      }
+    });
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  server.unref();
+  return {
+    port: server.address().port,
+    messages,
+    close: () => new Promise((resolve) => {
+      server.close(resolve);
+      server.closeAllConnections?.();
     }),
   };
 }

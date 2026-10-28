@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import { loadConfig } from '../src/config.js';
+import { checkEmailDns } from '../src/lib/dns-check.js';
+import { buildSmtpUrl, describeSmtpUrl, redactSmtpUrl } from '../src/lib/smtp-url.js';
 import { getMeta, openDatabase, recordBoot, schemaVersion } from '../src/db/index.js';
 import { seedSources } from '../src/db/seed.js';
-import { createMailer } from '../src/lib/mailer.js';
+import { createMailer, explainMailError } from '../src/lib/mailer.js';
 import { runDailyTedImport } from '../src/jobs/daily-ted.js';
 import { IssueError, buildDraftIssue, previousWeekSlug, publishIssue } from '../src/newsletter/issues.js';
 import { sendIssue } from '../src/newsletter/send.js';
@@ -30,6 +32,10 @@ const HELP = `Tendrelark command line
 
   migrate                         Create or update the database schema and seed the source list
   db:check                        Print what the database holds (use after a deploy to prove persistence)
+  mail:url --host H --port P --user U   Build a correctly encoded SMTP_URL (password from SMTP_PASSWORD or --password)
+  mail:test [--to ADDRESS]        Connect to SMTP_URL, log in and send a test email, with plain language errors
+  dns:check [--domain D] [--dkim-selector A,B]
+                                  Check the SPF, DKIM and DMARC records that decide whether your email reaches inboxes
   ted:probe                       Confirm the TED API works from this machine and show which fields it accepts
   ted:daily [--no-email]          The daily cycle: import, retry every 10 min for up to 1 h until it completes, then email the log
   ted:ingest [--from D] [--to D]  One import attempt, no retries and no email (dates as YYYY-MM-DD)
@@ -44,6 +50,39 @@ const HELP = `Tendrelark command line
 if (!command || command === 'help' || command === '--help') {
   console.log(HELP);
   process.exit(0);
+}
+
+// These two never touch the database, so they run first and do not create one.
+const earlyFlags = flags(rest);
+if (command === 'mail:url') {
+  try {
+    const url = buildSmtpUrl({ host: earlyFlags.host, port: earlyFlags.port, user: earlyFlags.user, password: typeof earlyFlags.password === 'string' ? earlyFlags.password : process.env.SMTP_PASSWORD });
+    console.log('Put this in your settings as SMTP_URL (keep it secret, it contains the password):\n');
+    console.log(url);
+    console.log(`\nWhat the app will use: ${JSON.stringify(describeSmtpUrl(url))}`);
+    console.log(`Safe to share in logs: ${redactSmtpUrl(url)}`);
+    process.exit(0);
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+}
+if (command === 'dns:check') {
+  const domain = typeof earlyFlags.domain === 'string' ? earlyFlags.domain : 'tendrelark.eu';
+  const selectors = typeof earlyFlags['dkim-selector'] === 'string' ? earlyFlags['dkim-selector'].split(',').map((x) => x.trim()).filter(Boolean) : [];
+  try {
+    const r = await checkEmailDns(domain, { dkimSelectors: selectors });
+    const line = (label, x) => console.log(`${x.status.toUpperCase().padEnd(5)} ${label}: ${x.message}${x.record ? `\n        ${x.record}` : ''}`);
+    console.log(`Email DNS for ${r.domain}\n`);
+    line('SPF', r.spf);
+    line('DMARC', r.dmarc);
+    for (const d of r.dkim) line(`DKIM (${d.selector})`, d);
+    if (!r.dkim.length) console.log('NOTE  DKIM was not checked. Your sending provider shows a selector name (for example "s1" or "mail"). Run again with --dkim-selector NAME.');
+    process.exit(r.ok ? 0 : 1);
+  } catch (err) {
+    console.error(`Could not look up DNS: ${err.message}`);
+    process.exit(1);
+  }
 }
 
 const config = loadConfig();
@@ -105,6 +144,32 @@ async function main() {
     case 'sources:verify': {
       const results = await verifySources(db, { log });
       return results.some((r) => r.status === 'unreachable') ? 1 : 0;
+    }
+
+    case 'mail:test': {
+      const mailer = createMailer(config, db, { log: console });
+      if (mailer.mode !== 'smtp') {
+        console.error('SMTP_URL is not set, so there is nothing to test. Build it with: npm run mail:url -- --host mail.example.com --port 465 --user support@tendrelark.eu');
+        return 1;
+      }
+      const to = typeof f.to === 'string' ? f.to : config.contact.email;
+      const d = describeSmtpUrl(config.mail.smtpUrl);
+      console.log(`Connecting to ${d.host}:${d.port} as ${d.user} (${d.secureFromStart ? 'encrypted from the start' : 'upgrades to encryption if offered'})...`);
+      try {
+        await mailer.verify();
+        console.log('Connected and logged in.');
+        await mailer.send({
+          to,
+          kind: 'mail_test',
+          subject: 'Tendrelark test email',
+          text: `This is a test email from the Tendrelark site.\n\nIf you can read it, sending works.\nSent from ${config.siteUrl} as ${config.mail.from}.\n`,
+        });
+        console.log(`Test email sent to ${to}. Check the inbox, and the spam folder, then run: npm run dns:check`);
+        return 0;
+      } catch (err) {
+        console.error(`FAILED: ${explainMailError(err)}\n(technical detail: ${err.code ?? 'no code'}, ${String(err.message).slice(0, 200)})`);
+        return 1;
+      }
     }
 
     case 'ted:daily': {
