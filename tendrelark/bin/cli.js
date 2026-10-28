@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+import fs from 'node:fs';
 import { loadConfig } from '../src/config.js';
 import { checkEmailDns } from '../src/lib/dns-check.js';
+import { downloadResource, fetchDatasetMeta, judgeFreshness, pickResource, renderDatasetReport, scanCsvDates, scanJsonDates } from '../src/sources/base-dataset.js';
 import { buildSmtpUrl, describeSmtpUrl, redactSmtpUrl } from '../src/lib/smtp-url.js';
 import { getMeta, openDatabase, recordBoot, schemaVersion } from '../src/db/index.js';
 import { seedSources } from '../src/db/seed.js';
@@ -8,6 +10,7 @@ import { createMailer, explainMailError } from '../src/lib/mailer.js';
 import { runDailyTedImport } from '../src/jobs/daily-ted.js';
 import { IssueError, buildDraftIssue, previousWeekSlug, publishIssue } from '../src/newsletter/issues.js';
 import { sendIssue } from '../src/newsletter/send.js';
+import { runFirstCheck, renderFirstRunReport } from '../src/ted/first-run.js';
 import { ingestTed, latestRuns, probeTed, reconcileTed, WATERMARK_KEY } from '../src/ted/ingest.js';
 import { verifySources } from '../src/sources/verify.js';
 import { tedStats } from '../src/tenders.js';
@@ -34,9 +37,13 @@ const HELP = `Tendrelark command line
   db:check                        Print what the database holds (use after a deploy to prove persistence)
   mail:url --host H --port P --user U   Build a correctly encoded SMTP_URL (password from SMTP_PASSWORD or --password)
   mail:test [--to ADDRESS]        Connect to SMTP_URL, log in and send a test email, with plain language errors
+  dataset:base [--download] [--max-mb N]
+                                  Check the Portal BASE open dataset on dados.gov.pt and find the newest notice date inside it
   dns:check [--domain D] [--dkim-selector A,B]
                                   Check the SPF, DKIM and DMARC records that decide whether your email reaches inboxes
   ted:probe                       Confirm the TED API works from this machine and show which fields it accepts
+  ted:first-run [--days N] [--out FILE]
+                                  The first real run: probe TED, import, compare with TED's counts, measure data quality, save a report
   ted:daily [--no-email]          The daily cycle: import, retry every 10 min for up to 1 h until it completes, then email the log
   ted:ingest [--from D] [--to D]  One import attempt, no retries and no email (dates as YYYY-MM-DD)
   ted:reconcile [--days N]        Compare TED's own counts with what is stored. Exits 1 on any gap
@@ -81,6 +88,33 @@ if (command === 'dns:check') {
     process.exit(r.ok ? 0 : 1);
   } catch (err) {
     console.error(`Could not look up DNS: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+if (command === 'dataset:base') {
+  try {
+    const meta = await fetchDatasetMeta();
+    const resource = pickResource(meta.resources);
+    if (!earlyFlags.download) {
+      console.log(renderDatasetReport({ meta, resource, scan: null }));
+      process.exit(0);
+    }
+    if (!resource) {
+      console.log(renderDatasetReport({ meta, resource, scan: null }));
+      process.exit(1);
+    }
+    fs.mkdirSync('data/downloads', { recursive: true });
+    const file = `data/downloads/base-announcements.${resource.format}`;
+    console.log(`Downloading ${resource.url} ...`);
+    const downloaded = await downloadResource(resource.url, file, { maxBytes: (Number(earlyFlags['max-mb']) || 600) * 1024 * 1024 });
+    const scan = resource.format === 'json' ? scanJsonDates(file) : await scanCsvDates(file);
+    const freshness = judgeFreshness(scan.newest);
+    console.log(renderDatasetReport({ meta, resource, scan, freshness, downloaded }));
+    console.log('Paste this into the Portugal issue on GitHub (#9) and record the decision.');
+    process.exit(freshness.level === 'stale' || freshness.level === 'unknown' ? 1 : 0);
+  } catch (err) {
+    console.error(`Could not check the dataset: ${err.message}`);
     process.exit(1);
   }
 }
@@ -170,6 +204,16 @@ async function main() {
         console.error(`FAILED: ${explainMailError(err)}\n(technical detail: ${err.code ?? 'no code'}, ${String(err.message).slice(0, 200)})`);
         return 1;
       }
+    }
+
+    case 'ted:first-run': {
+      const report = await runFirstCheck(db, config, { days: Number(f.days) || 30, log });
+      const text = renderFirstRunReport(report);
+      const out = typeof f.out === 'string' ? f.out : 'ted-first-run-report.txt';
+      fs.writeFileSync(out, text);
+      console.log(`\n${text}`);
+      console.log(`Report saved to ${out}. Paste it into the TED issue on GitHub (#2).`);
+      return report.ok ? 0 : 1;
     }
 
     case 'ted:daily': {
