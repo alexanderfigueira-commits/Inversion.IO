@@ -26,7 +26,7 @@ const SITE = 'https://www.feel2zen.pt/';
   let en = out.en
     .replace('<link rel="canonical" href="' + SITE + '">', '<link rel="canonical" href="' + SITE + 'en/">')
     .replace('<meta property="og:url" content="' + SITE + '">', '<meta property="og:url" content="' + SITE + 'en/">')
-    .replace(/(src|href)="(logo\.(?:webp|gif))"/g, '$1="../$2"');
+    .replace(/(src|href)="(logo\.(?:webp|gif)|hero\.webp)"/g, '$1="../$2"');
   fs.mkdirSync(path.join(root, 'en'), { recursive: true });
   fs.writeFileSync(path.join(root, 'en', 'index.html'), en);
   fs.writeFileSync(src, out.pt);
