@@ -99,14 +99,14 @@
   .btn.ghost:hover{background:var(--soft)}
   .btn:focus-visible,.tabs button:focus-visible,.lang button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
   .hero{position:relative;overflow:hidden;background:var(--bg)}
-  .hero-photo{position:absolute;top:0;right:0;bottom:0;width:54%;max-width:640px;height:100%;object-fit:cover;object-position:center 30%;
-    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 28%);mask-image:linear-gradient(to right,transparent 0,#000 28%)}
+  .hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:right 35%;
+    -webkit-mask-image:linear-gradient(to right,transparent 0,transparent 28%,#000 62%);mask-image:linear-gradient(to right,transparent 0,transparent 28%,#000 62%)}
   .hero .wrap{position:relative;min-height:560px;display:flex;flex-direction:column;justify-content:center;padding-block:72px}
   .hero-text{max-width:min(500px,50%)}
   .hero h1{font-size:clamp(2.6rem,5.5vw,4.3rem);margin-bottom:16px}
   .hero p{margin:0 0 28px;color:var(--muted);font-size:1.05rem}
   .hero .actions{display:flex;gap:12px;flex-wrap:wrap}
-  .hero-brand{position:absolute;top:28px;right:16px;text-align:right;line-height:1;color:#801557}
+  .hero-brand{text-align:left;line-height:1;color:#801557;margin-bottom:20px}
   .hero-brand b{display:block;font-family:"Saira Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:2.4rem;letter-spacing:.01em}
   .hero-brand span{font-size:.85rem;font-weight:500}
   section{padding:64px 0}
@@ -172,7 +172,7 @@
   .contact-box .card h3{font-size:1.3rem}
   footer{padding:32px 0;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.9rem}
   @media (prefers-reduced-motion:reduce){.orb{transition:none!important} html{scroll-behavior:auto}}
-  @media (max-width:820px){ nav ul{display:none} .hero-photo{position:relative;display:block;width:100%;max-width:none;height:300px;-webkit-mask-image:linear-gradient(to bottom,#000 65%,transparent);mask-image:linear-gradient(to bottom,#000 65%,transparent)} .hero .wrap{position:static;min-height:0;padding-block:8px 40px} .hero-text{max-width:none} .hero-brand{top:16px} .hero-brand b{font-size:1.9rem} .med-grid{grid-template-columns:1fr} .list{padding:4px 16px} }
+  @media (max-width:820px){ nav ul{display:none} .hero-photo{position:relative;display:block;inset:auto;width:100%;max-width:none;height:300px;object-position:72% 40%;-webkit-mask-image:linear-gradient(to bottom,#000 65%,transparent);mask-image:linear-gradient(to bottom,#000 65%,transparent)} .hero .wrap{position:static;min-height:0;padding-block:8px 40px} .hero-text{max-width:none} .hero-brand b{font-size:1.9rem} .med-grid{grid-template-columns:1fr} .list{padding:4px 16px} }
   @media (max-width:420px){ .logo span{display:none} .btn{padding:10px 16px} }
 </style>
 <script type="application/ld+json" id="faq-ld">{"@context":"https://schema.org","@type":"FAQPage","inLanguage":"pt-PT","mainEntity":[{"@type":"Question","name":"Onde fica a Feel2Zen?","acceptedAnswer":{"@type":"Answer","text":"Na Rua do Mercado nº 48A, Tires, 2785-630 S. Domingos de Rana, no concelho de Cascais."}},{"@type":"Question","name":"Qual é o horário de funcionamento?","acceptedAnswer":{"@type":"Answer","text":"De segunda a quarta feira e de sexta feira a sábado, das 10h às 14h e das 15h às 19h30."}},{"@type":"Question","name":"Como posso marcar um tratamento?","acceptedAnswer":{"@type":"Answer","text":"Pode marcar online em buk.pt/feel2zen ou ligar para o 912 508 447."}},{"@type":"Question","name":"Que serviços oferecem?","acceptedAnswer":{"@type":"Answer","text":"Massagens, reflexologia, drenagem linfática, manicure, pedicure, unhas de gel e acrílico, depilação a cera e threading, extensão e lifting de pestanas, limpeza de pele e outros tratamentos de estética e bem estar."}}]}</script></head>
@@ -206,10 +206,10 @@
 
 <main id="top">
   <div class="hero">
-    <img class="hero-photo" src="hero.webp" width="452" height="572" alt="Massagem relaxante no estúdio Feel2Zen / Relaxing massage at the Feel2Zen studio" fetchpriority="high">
+    <img class="hero-photo" src="hero.webp" width="1800" height="1005" alt="Massagem relaxante no estúdio Feel2Zen / Relaxing massage at the Feel2Zen studio" fetchpriority="high">
     <div class="wrap">
-      <div class="hero-brand" aria-hidden="true"><b>Feel2zen</b><span>by Sónia Serra</span></div>
       <div class="hero-text">
+        <div class="hero-brand" aria-hidden="true"><b>Feel2zen</b><span>by Sónia Serra</span></div>
         <h1 data-i18n="hero_h">Massagens e estética em Tires, Cascais</h1>
         <p data-i18n="hero_p">Um momento só para si. Massagens, reflexologia, unhas, depilação, pestanas e estética em S. Domingos de Rana. Pare um pouco, respire e deixe-nos cuidar de si.</p>
         <div class="actions">
