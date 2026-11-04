@@ -1,0 +1,26 @@
+[
+  {
+    "id": "demo-1",
+    "book": "[DEMO] Livro de exemplo",
+    "page": "1",
+    "buyUrl": "https://example.com/loja/livro-exemplo",
+    "tags": ["inversao", "sofrimento"],
+    "text": "[TEXTO DE DEMONSTRAÇÃO, não é do autor] A inversão acontece quando colocamos à frente aquilo que é secundário, como a aparência, o dinheiro ou a opinião dos outros, e deixamos para trás aquilo que é essencial. É daí que nasce muito do sofrimento."
+  },
+  {
+    "id": "demo-2",
+    "book": "[DEMO] Livro de exemplo",
+    "page": "2",
+    "buyUrl": "https://example.com/loja/livro-exemplo",
+    "tags": ["saude", "sintoma", "doenca"],
+    "text": "[TEXTO DE DEMONSTRAÇÃO, não é do autor] Aliviar um sintoma não é o mesmo que compreender a sua causa. A saúde começa quando a pessoa reconhece o que está invertido dentro de si e começa a desfazê-lo."
+  },
+  {
+    "id": "demo-3",
+    "book": "[DEMO] Outro livro de exemplo",
+    "page": "10",
+    "buyUrl": "https://example.com/loja/outro-livro",
+    "tags": ["trabalho", "sociedade", "politica", "economia"],
+    "text": "[TEXTO DE DEMONSTRAÇÃO, não é do autor] Quando uma sociedade valoriza mais o ter do que o ser, o trabalho deixa de ser um modo de servir e passa a ser uma corrida, e as pessoas adoecem nessa corrida."
+  }
+]

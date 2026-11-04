@@ -1,0 +1,5 @@
+server/data/books/
+server/data/corpus.local.json
+server/data/usage.json
+node_modules/
+.env

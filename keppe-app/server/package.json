@@ -1,0 +1,13 @@
+{
+  "name": "keppe-chat-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "DEV_MODE=1 node src/server.js",
+    "ingest": "node scripts/ingest.js",
+    "test": "node --test test/*.test.js"
+  }
+}

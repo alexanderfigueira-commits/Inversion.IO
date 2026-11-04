@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trilogia Chat (protótipo)</title>
+<style>
+  :root { --bg:#f6f3ee; --ink:#1f2a2e; --card:#fff; --accent:#2f5d62; --muted:#6b767a; --line:#e3ddd2; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14191b; --ink:#eaeeee; --card:#1d2427; --accent:#7fb3b8; --muted:#93a0a3; --line:#2b3539; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui, sans-serif; display:flex; flex-direction:column; height:100dvh; }
+  header { padding:12px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  header h1 { font-size:17px; margin:0; }
+  #timer { font-size:13px; color:var(--muted); white-space:nowrap; }
+  #log { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .msg { max-width:min(640px,92%); padding:10px 14px; border-radius:14px; background:var(--card); border:1px solid var(--line); white-space:pre-wrap; }
+  .me { align-self:flex-end; background:var(--accent); color:#fff; border-color:var(--accent); }
+  .cite { margin-top:8px; padding:8px 10px; border-left:3px solid var(--accent); background:rgba(47,93,98,.08); font-size:14px; }
+  .cite small { display:block; color:var(--muted); margin-top:4px; }
+  .cite a { display:inline-block; margin-top:6px; color:var(--accent); font-weight:600; }
+  form { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); }
+  input { flex:1; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--ink); font:inherit; }
+  button { padding:12px 16px; border:0; border-radius:12px; background:var(--accent); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.5; }
+  #paywall { display:none; margin:12px 16px; padding:16px; border-radius:14px; background:var(--card); border:1px solid var(--accent); }
+  #paywall h2 { margin:0 0 6px; font-size:17px; }
+  footer { padding:6px 16px 10px; font-size:12px; color:var(--muted); text-align:center; }
+</style>
+</head>
+<body>
+<header><h1>Trilogia Chat <small style="color:var(--muted)">protótipo</small></h1><div id="timer">…</div></header>
+<div id="log" aria-live="polite"></div>
+<div id="paywall">
+  <h2>Os teus 10 minutos gratuitos acabaram</h2>
+  <p id="paywallText"></p>
+  <button id="subscribe">Subscrever (simulação)</button>
+</div>
+<form id="form">
+  <input id="input" placeholder="Escreve a tua pergunta…" autocomplete="off" maxlength="1000" aria-label="Pergunta">
+  <button id="send">Enviar</button>
+</form>
+<footer>Ferramenta de estudo. Não substitui terapia nem apoio profissional. Em emergência, liga 112.</footer>
+<script>
+const id = (() => { try { let v = localStorage.getItem('dev'); if (!v) { v = crypto.randomUUID(); localStorage.setItem('dev', v); } return v; } catch { return crypto.randomUUID(); } })();
+const $ = (s) => document.querySelector(s);
+const log = $('#log'), input = $('#input'), send = $('#send');
+const history = [];
+const H = { 'content-type': 'application/json', 'x-device-id': id };
+
+const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+function showUsage(u) {
+  $('#timer').textContent = (u.plan === 'paid' ? 'Esta semana: ' : 'Grátis: ') + fmt(u.remainingSeconds) + ' restantes';
+}
+function showPaywall(p, u) {
+  $('#paywall').style.display = 'block';
+  $('#paywallText').textContent = `Continua com ${p.weeklyMinutes} minutos por semana por ${p.priceEur} € por ${p.period === 'week' ? 'semana' : 'mês'}.`;
+  input.disabled = send.disabled = true;
+  showUsage(u);
+}
+function bubble(text, cls) { const d = document.createElement('div'); d.className = 'msg ' + cls; d.textContent = text; log.append(d); log.scrollTop = log.scrollHeight; return d; }
+
+async function refresh() {
+  const r = await fetch('/api/status', { headers: H }); const j = await r.json();
+  showUsage(j.usage); if (j.usage.locked) showPaywall(j.paywall, j.usage);
+}
+$('#form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const text = input.value.trim(); if (!text) return;
+  input.value = ''; bubble(text, 'me'); send.disabled = true;
+  const wait = bubble('…', 'bot');
+  try {
+    const r = await fetch('/api/chat', { method: 'POST', headers: H, body: JSON.stringify({ message: text, history }) });
+    const j = await r.json();
+    if (r.status === 402) { wait.remove(); return showPaywall(j.paywall, j.usage); }
+    if (!r.ok) throw new Error(j.error || 'Erro');
+    wait.textContent = j.reply;
+    history.push({ role: 'user', content: text }, { role: 'assistant', content: j.reply });
+    for (const c of j.citations) {
+      const d = document.createElement('div'); d.className = 'cite';
+      d.append(document.createTextNode('“' + c.excerpt + '”'));
+      const s = document.createElement('small'); s.textContent = c.book + (c.page ? ', p. ' + c.page : ''); d.append(s);
+      const a = document.createElement('a'); a.href = c.buyUrl; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Comprar na ' + (j.publisher?.name || 'editora'); d.append(a);
+      wait.append(d);
+    }
+    showUsage(j.usage);
+    if (j.usage.locked) refresh();
+  } catch (err) { wait.textContent = 'Não consegui responder agora. Tenta outra vez.'; }
+  finally { if (!$('#paywall').style.display || $('#paywall').style.display === 'none') send.disabled = false; input.focus(); }
+});
+$('#subscribe').addEventListener('click', async () => {
+  const r = await fetch('/api/subscription/verify', { method: 'POST', headers: H, body: '{}' });
+  if (!r.ok) return alert('A subscrição real depende da Apple e ainda não está ligada.');
+  $('#paywall').style.display = 'none'; input.disabled = send.disabled = false; refresh();
+});
+bubble('Olá. Faz-me uma pergunta e eu respondo na lente da Trilogia Analítica, com excertos dos livros quando houver.', 'bot');
+refresh();
+</script>
+</body>
+</html>
