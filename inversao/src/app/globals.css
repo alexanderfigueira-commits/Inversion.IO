@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+/*
+  Paleta. Papel quente de dia, tinta escura de noite.
+  Verdade, Bondade e Beleza são as três cores de destaque da Trilogia.
+  Âmbar e barro marcam a inversão. Dourado e verde azulado marcam a consciência.
+  Os valores finais de contraste são afinados na fase 5.
+*/
+:root {
+  --paper: #f6f0e4;
+  --paper-raised: #fbf7ee;
+  --paper-sunk: #ede4d1;
+  --ink: #2b2519;
+  --ink-soft: #5f5543;
+  --line: #d8cbb0;
+
+  --verdade: #2f4f7f;
+  --bondade: #9a4660;
+  --beleza: #6a4c8c;
+
+  --ambar: #a76a12;
+  --barro: #8f4528;
+
+  --ouro: #8f6d12;
+  --azulado: #1f6f6c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17140f;
+    --paper-raised: #201c15;
+    --paper-sunk: #110f0b;
+    --ink: #eee6d4;
+    --ink-soft: #b3a78f;
+    --line: #373024;
+
+    --verdade: #8fb0e0;
+    --bondade: #e09bb2;
+    --beleza: #b9a0e0;
+
+    --ambar: #e0a54a;
+    --barro: #d68a67;
+
+    --ouro: #d9b54a;
+    --azulado: #5fc0bb;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #17140f;
+  --paper-raised: #201c15;
+  --paper-sunk: #110f0b;
+  --ink: #eee6d4;
+  --ink-soft: #b3a78f;
+  --line: #373024;
+
+  --verdade: #8fb0e0;
+  --bondade: #e09bb2;
+  --beleza: #b9a0e0;
+
+  --ambar: #e0a54a;
+  --barro: #d68a67;
+
+  --ouro: #d9b54a;
+  --azulado: #5fc0bb;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-raised: var(--paper-raised);
+  --color-sunk: var(--paper-sunk);
+  --color-ink: var(--ink);
+  --color-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-verdade: var(--verdade);
+  --color-bondade: var(--bondade);
+  --color-beleza: var(--beleza);
+  --color-ambar: var(--ambar);
+  --color-barro: var(--barro);
+  --color-ouro: var(--ouro);
+  --color-azulado: var(--azulado);
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-newsreader), Georgia, serif;
+}
+
+html {
+  background: var(--paper);
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+:focus-visible {
+  outline: 2px solid var(--verdade);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
