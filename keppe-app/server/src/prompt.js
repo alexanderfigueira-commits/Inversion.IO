@@ -2,10 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
 
-const CRISIS = /(suicid|me matar|matar-me|acabar com a minha vida|quero morrer|tirar a minha vida|auto.?mutila|me cortar)/i;
+// Comparado sem acentos, senao "suicidio" com acento nao era apanhado.
+const CRISIS = /(suicid|me matar|matar-me|acabar com a minha vida|quero morrer|tirar a minha vida|auto.?mutila|me cortar)/;
 
 export function isCrisis(text) {
-  return CRISIS.test(text);
+  return CRISIS.test(text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
 }
 
 export const CRISIS_REPLY =
