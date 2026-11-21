@@ -1,0 +1,531 @@
+<meta charset="utf-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Desenho da Inversão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap">
+<style>
+  /* Conceito: uma folha de explicação com o mesmo papel e a mesma tinta da app. O diagrama vertical
+     ao lado do texto é a peça central; os wireframes são cinzentos de propósito, para não parecerem acabados. */
+  :root {
+    --paper: #f6f0e4; --raised: #fbf7ee; --sunk: #ede4d1;
+    --ink: #2b2519; --soft: #5f5543; --line: #d8cbb0;
+    --verdade: #2f4f7f; --azulado: #1f6f6c; --barro: #8f4528; --ambar: #a76a12; --ouro: #8f6d12;
+    --fonte-titulo: "Fraunces", Georgia, serif;
+    --fonte-texto: "Newsreader", Georgia, serif;
+    --fonte-codigo: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #17140f; --raised: #201c15; --sunk: #110f0b;
+      --ink: #eee6d4; --soft: #b3a78f; --line: #373024;
+      --verdade: #8fb0e0; --azulado: #5fc0bb; --barro: #d68a67; --ambar: #e0a54a; --ouro: #d9b54a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #17140f; --raised: #201c15; --sunk: #110f0b;
+    --ink: #eee6d4; --soft: #b3a78f; --line: #373024;
+    --verdade: #8fb0e0; --azulado: #5fc0bb; --barro: #d68a67; --ambar: #e0a54a; --ouro: #d9b54a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 1.0625rem/1.6 var(--fonte-texto);
+    padding-block: 2.5rem 4rem;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .pagina { max-width: 66rem; margin-inline: auto; display: grid; gap: 4.5rem; }
+  h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 400; letter-spacing: -0.012em; line-height: 1.15; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); }
+  h2 { font-size: clamp(1.6rem, 3.6vw, 2.2rem); }
+  h3 { font-size: 1.2rem; font-weight: 600; }
+  p { margin: 0; }
+  code, .cod { font-family: var(--fonte-codigo); font-size: 0.86em; }
+  a { color: var(--verdade); }
+  :focus-visible { outline: 2px solid var(--verdade); outline-offset: 3px; border-radius: 3px; }
+
+  .etiqueta { font: 500 0.74rem/1 var(--fonte-codigo); letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); }
+  .intro { display: grid; gap: 1.1rem; max-width: 46rem; }
+  .intro p { color: var(--soft); font-size: 1.2rem; }
+  .estado-geral { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.4rem; }
+
+  .selo { display: inline-flex; align-items: center; gap: 0.45rem; font: 500 0.78rem/1 var(--fonte-codigo); padding: 0.4rem 0.65rem; border: 1px solid var(--line); border-radius: 99px; background: var(--raised); }
+  .selo::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--soft); }
+  .selo.feito::before { background: var(--azulado); }
+  .selo.parcial::before { background: var(--ambar); }
+  .selo.futuro { border-style: dashed; color: var(--soft); }
+
+  .cabeca { display: grid; gap: 0.6rem; margin-bottom: 1.6rem; max-width: 44rem; }
+  .cabeca p { color: var(--soft); }
+
+  /* Arquitetura */
+  .arq { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
+  @media (min-width: 860px) { .arq { grid-template-columns: minmax(0, 27rem) minmax(0, 1fr); gap: 3rem; } }
+  .diagrama { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 0.75rem; }
+  .diagrama svg { display: block; width: 100%; height: auto; }
+  .notas { display: grid; gap: 1.4rem; }
+  .nota { display: grid; gap: 0.25rem; padding-left: 1rem; border-left: 3px solid var(--cor, var(--line)); }
+  .nota p { color: var(--soft); }
+  .nota.nav { --cor: var(--verdade); } .nota.srv { --cor: var(--azulado); } .nota.ia { --cor: var(--barro); } .nota.fut { --cor: var(--soft); }
+
+  /* SVG */
+  .s-zona { stroke-width: 1.5; }
+  .z-nav { fill: color-mix(in srgb, var(--verdade) 9%, var(--paper)); stroke: var(--verdade); }
+  .z-srv { fill: color-mix(in srgb, var(--azulado) 9%, var(--paper)); stroke: var(--azulado); }
+  .z-ia  { fill: color-mix(in srgb, var(--barro) 10%, var(--paper)); stroke: var(--barro); }
+  .z-fut { fill: none; stroke: var(--soft); stroke-dasharray: 5 4; }
+  .s-caixa { fill: var(--raised); stroke: var(--line); stroke-width: 1.2; }
+  .s-pilula { fill: var(--paper); stroke: var(--line); stroke-width: 1.2; }
+  .s-texto { fill: var(--ink); font: 400 13px var(--fonte-texto); }
+  .s-forte { fill: var(--ink); font: 600 13px var(--fonte-texto); }
+  .s-leve { fill: var(--soft); font: 400 11.5px var(--fonte-texto); }
+  .s-zona-nome { fill: var(--soft); font: 500 10px var(--fonte-codigo); letter-spacing: 0.1em; }
+  .s-cod { fill: var(--soft); font: 400 10.5px var(--fonte-codigo); }
+  .s-seta { stroke: var(--soft); stroke-width: 1.5; fill: none; marker-end: url(#ponta); }
+  .s-seta-t { stroke-dasharray: 4 3; }
+
+  /* Passos da rota */
+  .passos { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--line); }
+  .passo { display: grid; gap: 0.35rem 1.5rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 760px) { .passo { grid-template-columns: 2.2rem minmax(0, 13rem) minmax(0, 1fr) minmax(0, 15rem); align-items: baseline; } }
+  .passo .n { font: 500 0.9rem var(--fonte-codigo); color: var(--soft); }
+  .passo .quem { font-family: var(--fonte-titulo); font-size: 1.1rem; font-weight: 600; }
+  .passo .faz { color: var(--ink); }
+  .passo .falha { color: var(--soft); font-size: 0.98rem; }
+  .passo .falha b { font: 500 0.8rem var(--fonte-codigo); color: var(--barro); }
+  .legenda-cols { display: none; }
+  @media (min-width: 760px) { .legenda-cols { display: grid; grid-template-columns: 2.2rem minmax(0, 13rem) minmax(0, 1fr) minmax(0, 15rem); gap: 0 1.5rem; padding-bottom: 0.6rem; } }
+
+  /* Wireframes */
+  .telas { display: grid; gap: 2.5rem 1.5rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); align-items: start; }
+  .tela { display: grid; gap: 0.9rem; justify-items: center; }
+  .tela-leg { display: grid; gap: 0.4rem; width: 100%; max-width: 15rem; }
+  .tela-leg p { color: var(--soft); font-size: 0.98rem; }
+  .tel { width: 15rem; border: 2px solid var(--ink); border-radius: 26px; background: var(--paper); padding: 1.1rem 0.9rem 0; display: grid; gap: 0.6rem; overflow: hidden; align-content: start; }
+  .tel .topo { font: 400 1.05rem var(--fonte-titulo); color: var(--ink); }
+  .ln { height: 0.5rem; border-radius: 3px; background: var(--line); }
+  .ln.c { width: 70%; } .ln.m { width: 45%; } .ln.f { background: var(--ink); opacity: 0.75; }
+  .blk { border: 1.5px dashed var(--soft); border-radius: 8px; padding: 0.55rem; display: grid; gap: 0.35rem; font: 500 0.66rem/1.2 var(--fonte-codigo); color: var(--soft); }
+  .blk.cheio { border-style: solid; border-color: var(--line); background: var(--raised); }
+  .blk.inv { border-style: solid; border-color: var(--ambar); background: color-mix(in srgb, var(--ambar) 10%, var(--paper)); }
+  .blk .t { color: var(--ink); font-weight: 500; }
+  .botao { background: var(--ink); color: var(--paper); border-radius: 8px; padding: 0.5rem; text-align: center; font: 500 0.7rem var(--fonte-codigo); }
+  .opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+  .barra { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); margin: 0.4rem -0.9rem 0; background: var(--raised); font: 500 0.55rem var(--fonte-codigo); color: var(--soft); text-align: center; }
+  .barra span { padding: 0.65rem 0 0.8rem; }
+  .barra .ativo { color: var(--ink); box-shadow: inset 0 2px 0 var(--ouro); }
+  .medidor { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem; align-items: stretch; }
+  .escala { display: grid; grid-template-rows: repeat(4, 1.1rem); gap: 3px; width: 1.1rem; }
+  .escala i { border-radius: 3px; background: color-mix(in srgb, var(--ouro) 18%, var(--paper)); border: 1px solid var(--line); }
+  .escala i.on { background: var(--ouro); border-color: var(--ouro); }
+  .nums { display: grid; grid-template-rows: repeat(4, 1.1rem); gap: 3px; align-items: center; font: 500 0.6rem var(--fonte-codigo); color: var(--soft); }
+  .selo-ver { justify-self: start; font: 500 0.62rem var(--fonte-codigo); padding: 0.25rem 0.5rem; border: 1.5px solid var(--azulado); color: var(--azulado); border-radius: 4px; }
+  .pesquisa { border: 1.5px solid var(--line); border-radius: 8px; padding: 0.5rem; font: 400 0.66rem var(--fonte-codigo); color: var(--soft); background: var(--raised); }
+
+  /* JSON */
+  .caixa-rolar { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--raised); }
+  table { border-collapse: collapse; width: 100%; min-width: 38rem; font-size: 0.98rem; }
+  th, td { text-align: left; vertical-align: top; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); }
+  th { font: 500 0.72rem var(--fonte-codigo); letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); background: var(--sunk); }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { font-family: var(--fonte-codigo); font-size: 0.84rem; white-space: nowrap; }
+  td.sub { color: var(--soft); }
+
+  pre { margin: 0; padding: 1rem 1.1rem; overflow-x: auto; background: var(--raised); border: 1px solid var(--line); border-radius: 8px; font: 400 0.84rem/1.55 var(--fonte-codigo); color: var(--ink); }
+  .dois { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 860px) { .dois { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; } }
+  .dois > * { min-width: 0; }
+  .dois.uma { grid-template-columns: minmax(0, 1fr); }
+  .vc { color: var(--soft); }
+
+  /* Fases */
+  .fases { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .fase { display: grid; gap: 0.3rem 1.2rem; padding: 1rem 0; border-bottom: 1px solid var(--line); grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 760px) { .fase { grid-template-columns: 2.2rem minmax(0, 1fr) 11rem; align-items: baseline; } }
+  .fase .n { font: 500 0.9rem var(--fonte-codigo); color: var(--soft); }
+  .fase p { color: var(--soft); }
+  .fase b { font-family: var(--fonte-titulo); font-weight: 600; color: var(--ink); }
+
+  .cartoes { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+  .cartao { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 1.1rem 1.2rem; display: grid; gap: 0.4rem; align-content: start; }
+  .cartao p { color: var(--soft); font-size: 0.98rem; }
+
+  .aviso { border: 1px solid var(--ambar); border-radius: 10px; padding: 1.1rem 1.3rem; background: color-mix(in srgb, var(--ambar) 8%, var(--paper)); display: grid; gap: 0.4rem; }
+  .aviso p { color: var(--ink); }
+  footer { color: var(--soft); font-size: 0.95rem; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="pagina">
+
+  <header class="intro">
+    <span class="etiqueta">Como está desenhada</span>
+    <h1>Inversão</h1>
+    <p>Uma aplicação web que leva a tua skill de análise do pensamento, à luz da Trilogia Analítica, para o browser. A pessoa cola um texto, a skill pensa com um conselho de seis agentes, e o ecrã mostra onde está a inversão e o que fica são.</p>
+    <div class="estado-geral" role="list" aria-label="Estado do projeto">
+      <span class="selo feito" role="listitem">Fase 1 feita: esqueleto e ecrãs</span>
+      <span class="selo feito" role="listitem">Fase 2 feita: rota da API</span>
+      <span class="selo" role="listitem">Fases 3 a 6 por fazer</span>
+      <span class="selo futuro" role="listitem">Contas e Stripe: só preparado</span>
+    </div>
+  </header>
+
+  <!-- 1. ARQUITETURA -->
+  <section aria-labelledby="h-arq">
+    <div class="cabeca">
+      <span class="etiqueta">A visão de cima</span>
+      <h2 id="h-arq">Quem fala com quem</h2>
+      <p>Três sítios, e cada um guarda uma coisa diferente. O teu telemóvel guarda o histórico, o servidor guarda a skill e a chave, e a Anthropic só vê o texto do pedido.</p>
+    </div>
+
+    <div class="arq">
+      <figure class="diagrama" style="margin:0">
+        <svg viewBox="0 0 452 770" role="img" aria-labelledby="svg-t svg-d">
+          <title id="svg-t">Arquitetura da Inversão</title>
+          <desc id="svg-d">O browser envia o texto à rota da API no servidor. A rota valida, verifica sofrimento sério e limites, monta o prompt com a skill, chama a Anthropic e valida o JSON que volta. A chave vem do Secret Manager. Contas e Stripe ficam para mais tarde, ligados por acesso.ts.</desc>
+          <defs>
+            <marker id="ponta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--soft)"/>
+            </marker>
+          </defs>
+
+          <!-- Zona 1: browser -->
+          <rect class="s-zona z-nav" x="8" y="8" width="404" height="140" rx="10"/>
+          <text class="s-zona-nome" x="22" y="30">NO TELEMÓVEL · BROWSER</text>
+          <rect class="s-caixa" x="22" y="44" width="214" height="86" rx="8"/>
+          <text class="s-forte" x="36" y="68">Ecrãs da app (PWA)</text>
+          <text class="s-leve" x="36" y="88">Analisar · Resultado</text>
+          <text class="s-leve" x="36" y="106">Histórico · Definições</text>
+          <rect class="s-caixa" x="250" y="44" width="148" height="86" rx="8"/>
+          <text class="s-forte" x="264" y="68">IndexedDB</text>
+          <text class="s-leve" x="264" y="88">Histórico guardado</text>
+          <text class="s-leve" x="264" y="106">só neste aparelho</text>
+
+          <!-- setas browser <-> servidor -->
+          <path class="s-seta" d="M130 148 V 208"/>
+          <text class="s-leve" x="140" y="172">texto, modo, debate</text>
+          <text class="s-cod" x="140" y="188">POST /api/analisar</text>
+          <path class="s-seta" d="M330 208 V 150"/>
+          <text class="s-leve" x="322" y="172" text-anchor="end">análise</text>
+          <text class="s-leve" x="322" y="188" text-anchor="end">em JSON</text>
+
+          <!-- Zona 2: servidor -->
+          <rect class="s-zona z-srv" x="8" y="208" width="404" height="318" rx="10"/>
+          <text class="s-zona-nome" x="22" y="230">NO SERVIDOR · NEXT.JS NO CLOUD RUN</text>
+
+          <rect class="s-caixa" x="136" y="246" width="164" height="258" rx="8"/>
+          <text class="s-forte" x="218" y="268" text-anchor="middle">Rota da análise</text>
+          <text class="s-cod" x="218" y="283" text-anchor="middle">route.ts</text>
+
+          <rect class="s-pilula" x="148" y="296" width="140" height="30" rx="15"/>
+          <text class="s-texto" x="218" y="316" text-anchor="middle">Validar o pedido</text>
+          <rect class="s-pilula" x="148" y="334" width="140" height="30" rx="15"/>
+          <text class="s-texto" x="218" y="354" text-anchor="middle">Sofrimento sério?</text>
+          <rect class="s-pilula" x="148" y="372" width="140" height="30" rx="15"/>
+          <text class="s-texto" x="218" y="392" text-anchor="middle">Limites por IP</text>
+          <rect class="s-pilula" x="148" y="410" width="140" height="30" rx="15"/>
+          <text class="s-texto" x="218" y="430" text-anchor="middle">Montar o prompt</text>
+          <rect class="s-pilula" x="148" y="460" width="140" height="30" rx="15"/>
+          <text class="s-texto" x="218" y="480" text-anchor="middle">Validar o JSON</text>
+
+          <!-- skill (esquerda) -->
+          <rect class="s-caixa" x="20" y="396" width="100" height="84" rx="8"/>
+          <text class="s-forte" x="70" y="418" text-anchor="middle">skill/</text>
+          <text class="s-cod" x="70" y="436" text-anchor="middle">SKILL.md</text>
+          <text class="s-leve" x="70" y="454" text-anchor="middle">+ sinais de</text>
+          <text class="s-leve" x="70" y="468" text-anchor="middle">inversão</text>
+          <path class="s-seta" d="M120 425 H 148"/>
+
+          <!-- secret manager (direita) -->
+          <rect class="s-caixa" x="316" y="396" width="86" height="84" rx="8"/>
+          <text class="s-forte" x="359" y="418" text-anchor="middle">Secret</text>
+          <text class="s-forte" x="359" y="434" text-anchor="middle">Manager</text>
+          <text class="s-leve" x="359" y="456" text-anchor="middle">chave da</text>
+          <text class="s-leve" x="359" y="470" text-anchor="middle">Anthropic</text>
+          <path class="s-seta" d="M316 425 H 288"/>
+
+          <!-- servidor <-> Anthropic -->
+          <path class="s-seta" d="M178 526 V 586"/>
+          <text class="s-leve" x="188" y="550">skill + texto</text>
+          <text class="s-leve" x="188" y="566">(skill em cache)</text>
+          <path class="s-seta" d="M258 586 V 528"/>
+          <text class="s-leve" x="268" y="550">JSON</text>
+
+          <!-- Zona 3: Anthropic -->
+          <rect class="s-zona z-ia" x="8" y="586" width="404" height="84" rx="10"/>
+          <text class="s-zona-nome" x="22" y="608">FORA · API DA ANTHROPIC</text>
+          <text class="s-forte" x="22" y="632">claude-sonnet-5-5</text>
+          <text class="s-leve" x="22" y="652">O conselho dos seis agentes pensa aqui, dentro de uma só chamada.</text>
+
+          <!-- Zona 4: futuro -->
+          <rect class="s-zona z-fut" x="8" y="696" width="404" height="66" rx="10"/>
+          <text class="s-zona-nome" x="22" y="718">MAIS TARDE · NÃO FEITO</text>
+          <text class="s-texto" x="22" y="742">Contas e subscrição Stripe de 9,99 € por mês</text>
+          <path class="s-seta s-seta-t" d="M412 729 H 430 V 330 H 414"/>
+          <text class="s-cod" x="443" y="530" text-anchor="middle" transform="rotate(-90 443 530)">acesso.ts</text>
+        </svg>
+        <figcaption style="padding: 0.7rem 0.4rem 0.2rem; color: var(--soft); font-size: 0.95rem">A linha tracejada é o ponto de ligação <span class="cod">acesso.ts</span>, ainda vazio.</figcaption>
+      </figure>
+
+      <div class="notas">
+        <div class="nota nav">
+          <h3>No telemóvel</h3>
+          <p>A app é uma PWA, por isso instala-se no iPhone com "Adicionar ao ecrã principal". Tudo o que a pessoa escreve e o histórico ficam no próprio aparelho (IndexedDB). Não há base de dados nesta versão.</p>
+        </div>
+        <div class="nota srv">
+          <h3>No servidor</h3>
+          <p>Uma só aplicação Next.js serve os ecrãs e a rota da API. É aqui que a skill é lida do disco e transformada em prompt, e é aqui que a chave da API vive, guardada no Secret Manager. O browser nunca a vê.</p>
+        </div>
+        <div class="nota ia">
+          <h3>Na Anthropic</h3>
+          <p>Recebe o prompt e o texto, e devolve um único objeto JSON. O conselho de seis agentes corre dentro dessa chamada, tal como a skill o descreve, e não como seis chamadas separadas. Por isso uma análise custa uma chamada, não seis.</p>
+        </div>
+        <div class="nota fut">
+          <h3>Mais tarde</h3>
+          <p>Contas e a subscrição com o Stripe ficam fora desta versão. A rota já pergunta a <span class="cod">acesso.ts</span> quem é o utilizador, e hoje a resposta é sempre "anónimo". Quando houver contas, muda esse ficheiro e o resto fica como está.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. PASSOS DA ROTA -->
+  <section aria-labelledby="h-passos">
+    <div class="cabeca">
+      <span class="etiqueta">Dentro da rota</span>
+      <h2 id="h-passos">O que acontece a uma análise</h2>
+      <p>São sete passos, sempre pela mesma ordem. Os primeiros quatro protegem a fatura e as pessoas, e só depois se gasta dinheiro com o modelo.</p>
+    </div>
+    <div class="legenda-cols etiqueta" aria-hidden="true"><span></span><span>Passo</span><span>O que faz</span><span>Se falhar</span></div>
+    <ol class="passos">
+      <li class="passo"><span class="n">1</span><span class="quem">Validar o pedido</span><span class="faz">Lê o corpo com um teto de tamanho, confirma o formato e corta textos com mais de 4000 caracteres.</span><span class="falha"><b>400 / 413</b> Mensagem em português a dizer o que corrigir.</span></li>
+      <li class="passo"><span class="n">2</span><span class="quem">Sofrimento sério?</span><span class="faz">Procura sinais de que a pessoa pensa em fazer mal a si própria. Se encontra, não analisa nada.</span><span class="falha"><b>200</b> Devolve uma mensagem de cuidado com o 112 e o SNS 24, sem chamar o modelo e sem gastar do limite.</span></li>
+      <li class="passo"><span class="n">3</span><span class="quem">Limites por IP</span><span class="faz">10 análises por hora e 30 por dia por IP, mais um teto global diário que protege a fatura.</span><span class="falha"><b>429</b> Diz quando pode voltar, com o cabeçalho Retry-After.</span></li>
+      <li class="passo"><span class="n">4</span><span class="quem">Montar o prompt</span><span class="faz">Junta o SKILL.md, a referência e as regras da aplicação. O texto da pessoa vai entre etiquetas, como material a analisar e nunca como ordens.</span><span class="falha">Sem falha possível aqui, a skill é lida do disco.</span></li>
+      <li class="passo"><span class="n">5</span><span class="quem">Chamar o modelo</span><span class="faz">Envia o pedido à Anthropic. A parte grande do prompt, a skill, leva cache e sai mais barata nos pedidos seguintes.</span><span class="falha"><b>503</b> Serviço ocupado ou chave em falta. O detalhe técnico não chega à pessoa.</span></li>
+      <li class="passo"><span class="n">6</span><span class="quem">Validar o JSON</span><span class="faz">Confere cada campo (a escala de 1 a 4, a síntese de 4 a 6 pontos, os seis agentes no debate). Se falhar, pede ao modelo que corrija, uma só vez.</span><span class="falha"><b>502</b> Depois de duas falhas, erro claro a pedir para tentar de novo.</span></li>
+      <li class="passo"><span class="n">7</span><span class="quem">Devolver a análise</span><span class="faz">Responde com a análise e com quantas tentativas foram precisas. O debate só vai se foi pedido.</span><span class="falha"><b>200</b> O ecrã mostra o resultado e guarda-o no histórico.</span></li>
+    </ol>
+  </section>
+
+  <!-- 3. WIREFRAMES -->
+  <section aria-labelledby="h-telas">
+    <div class="cabeca">
+      <span class="etiqueta">Os quatro ecrãs</span>
+      <h2 id="h-telas">Wireframes</h2>
+      <p>Pensados primeiro para o telemóvel, com a barra de navegação ao alcance do polegar. No computador a barra passa para o topo. As linhas tracejadas são zonas que ainda não existem.</p>
+    </div>
+
+    <div class="telas">
+      <!-- Início -->
+      <div class="tela">
+        <div class="tel" role="img" aria-label="Wireframe do ecrã Início: título, caixa de texto grande, escolha de modo, interruptor do debate e botão Analisar">
+          <div class="topo">Inversão</div>
+          <div class="ln f"></div><div class="ln c"></div>
+          <div class="blk" style="min-height:5.6rem"><span class="t">Cola aqui o texto</span><span>raciocínio, decisão, post ou argumento</span></div>
+          <div class="opcoes"><div class="blk cheio"><span class="t">Trilógico</span></div><div class="blk"><span class="t">Simples</span></div></div>
+          <div class="blk" style="grid-template-columns:1fr auto;align-items:center"><span class="t">Mostrar o debate</span><span>[ ]</span></div>
+          <div class="botao">Analisar</div>
+          <div class="barra"><span class="ativo">Analisar</span><span>Resultado</span><span>Histórico</span><span>Definições</span></div>
+        </div>
+        <div class="tela-leg">
+          <h3>Início</h3>
+          <p>Onde tudo começa. A pessoa escolhe entre vocabulário do Keppe e linguagem simples, e decide se quer ver o debate.</p>
+          <span class="selo parcial">Estrutura feita, sem lógica</span>
+        </div>
+      </div>
+
+      <!-- Resultado -->
+      <div class="tela">
+        <div class="tel" role="img" aria-label="Wireframe do ecrã Resultado: resposta direta, cartão Onde está a inversão com quatro partes, síntese, medidor vertical de 1 a 4, veredito e debate expansível">
+          <div class="topo">Resultado</div>
+          <div class="blk cheio"><span class="t">Resposta direta</span><div class="ln"></div><div class="ln"></div><div class="ln c"></div></div>
+          <div class="blk inv"><span class="t">Onde está a inversão</span>
+            <span>Raiz</span><div class="ln m"></div>
+            <span>Mecanismo</span><div class="ln c"></div>
+            <span>Essência bloqueada</span><div class="ln c"></div>
+            <span>Tomar consciência</span><div class="ln m"></div>
+          </div>
+          <div class="blk cheio"><span class="t">Síntese</span><div class="ln"></div><div class="ln c"></div><div class="ln"></div><div class="ln m"></div></div>
+          <div class="medidor"><div class="nums"><span>4</span><span>3</span><span>2</span><span>1</span></div><div class="escala"><i></i><i></i><i class="on"></i><i></i></div></div>
+          <span class="selo-ver">SEGUIR COM CUIDADO</span>
+          <div class="blk"><span class="t">▸ Debate dos seis agentes</span></div>
+          <div class="barra"><span>Analisar</span><span class="ativo">Resultado</span><span>Histórico</span><span>Definições</span></div>
+        </div>
+        <div class="tela-leg">
+          <h3>Resultado</h3>
+          <p>A resposta direta vem primeiro. A escala de consciência é um medidor vertical de 1 a 4. O veredito só aparece quando há uma decisão em causa.</p>
+          <span class="selo">Por construir (fase 3)</span>
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="tela">
+        <div class="tel" role="img" aria-label="Wireframe do ecrã Histórico: campo de pesquisa e lista de análises anteriores com opção de apagar">
+          <div class="topo">Histórico</div>
+          <div class="pesquisa">Procurar nas análises…</div>
+          <div class="blk cheio" style="grid-template-columns:1fr auto;align-items:start"><div style="display:grid;gap:.35rem"><span class="t">Devo despedir o sócio?</span><div class="ln c"></div><span>há 2 dias · Trilógico</span></div><span>apagar</span></div>
+          <div class="blk cheio" style="grid-template-columns:1fr auto;align-items:start"><div style="display:grid;gap:.35rem"><span class="t">A equipa está desmotivada</span><div class="ln c"></div><span>há 5 dias · Simples</span></div><span>apagar</span></div>
+          <div class="blk cheio" style="grid-template-columns:1fr auto;align-items:start"><div style="display:grid;gap:.35rem"><span class="t">Post sobre preços</span><div class="ln c"></div><span>há 9 dias · Trilógico</span></div><span>apagar</span></div>
+          <div class="blk"><span>Só neste aparelho. Nada vai para um servidor.</span></div>
+          <div class="barra" style="margin-top:3.6rem"><span>Analisar</span><span>Resultado</span><span class="ativo">Histórico</span><span>Definições</span></div>
+        </div>
+        <div class="tela-leg">
+          <h3>Histórico</h3>
+          <p>Lista das análises anteriores, com pesquisa e opção de apagar uma a uma. Vive no IndexedDB do próprio aparelho.</p>
+          <span class="selo">Por construir (fase 4)</span>
+        </div>
+      </div>
+
+      <!-- Definições -->
+      <div class="tela">
+        <div class="tel" role="img" aria-label="Wireframe do ecrã Definições: modo por defeito, tamanho da letra, apagar o histórico e texto sobre os limites da análise">
+          <div class="topo">Definições</div>
+          <span class="etiqueta" style="font-size:.6rem">Modo por defeito</span>
+          <div class="opcoes"><div class="blk cheio"><span class="t">Trilógico</span></div><div class="blk"><span class="t">Simples</span></div></div>
+          <span class="etiqueta" style="font-size:.6rem">Tamanho da letra</span>
+          <div class="opcoes" style="grid-template-columns:repeat(3,1fr)"><div class="blk cheio"><span class="t">Normal</span></div><div class="blk"><span class="t">Grande</span></div><div class="blk"><span class="t">Maior</span></div></div>
+          <div class="blk" style="border-color:var(--barro);color:var(--barro)"><span class="t" style="color:var(--barro)">Apagar o histórico</span></div>
+          <div class="blk cheio" style="margin-top:.4rem"><span class="t">Sobre esta análise</span><div class="ln"></div><div class="ln c"></div><div class="ln m"></div><span>Incide em ideias, não é diagnóstico de pessoas.</span></div>
+          <div class="barra" style="margin-top:2.6rem"><span>Analisar</span><span>Resultado</span><span>Histórico</span><span class="ativo">Definições</span></div>
+        </div>
+        <div class="tela-leg">
+          <h3>Definições</h3>
+          <p>Modo por defeito, tamanho da letra e apagar tudo. Inclui o texto curto que explica que a análise é sobre ideias e não sobre pessoas.</p>
+          <span class="selo parcial">Estrutura feita, sem lógica</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. JSON -->
+  <section aria-labelledby="h-json">
+    <div class="cabeca">
+      <span class="etiqueta">O contrato entre servidor e ecrã</span>
+      <h2 id="h-json">O que o modelo devolve</h2>
+      <p>Cada campo do JSON tem um lugar certo no ecrã Resultado. O servidor só deixa passar uma resposta que cumpra este formato.</p>
+    </div>
+    <div class="dois uma">
+      <div class="caixa-rolar">
+        <table>
+          <thead><tr><th>Campo</th><th>O que é</th><th>Onde aparece</th></tr></thead>
+          <tbody>
+            <tr><td>respostaDireta</td><td class="sub">2 a 4 parágrafos</td><td>Topo do resultado</td></tr>
+            <tr><td>inversao</td><td class="sub">raiz, mecanismo, essenciaBloqueada, tomarConsciencia</td><td>Cartão "Onde está a inversão"</td></tr>
+            <tr><td>semInversaoRelevante</td><td class="sub">verdadeiro ou falso</td><td>Se verdadeiro, o cartão diz o que está são</td></tr>
+            <tr><td>sintese</td><td class="sub">lista de 4 a 6 pontos</td><td>Secção Síntese</td></tr>
+            <tr><td>escala</td><td class="sub">inteiro de 1 a 4</td><td>Medidor vertical</td></tr>
+            <tr><td>escalaJustificacao</td><td class="sub">uma frase</td><td>Por baixo do medidor</td></tr>
+            <tr><td>veredito</td><td class="sub">opcional: decisão e frase</td><td>Selo, só se há decisão</td></tr>
+            <tr><td>debate</td><td class="sub">só se pedido: seis falas</td><td>Bloco expansível</td></tr>
+            <tr><td>cuidado</td><td class="sub">caso especial: só uma mensagem</td><td>Substitui a análise</td></tr>
+          </tbody>
+        </table>
+      </div>
+<pre><code>{
+  "respostaDireta": "…",
+  "inversao": {
+    "raiz": "…",
+    "mecanismo": "…",
+    "essenciaBloqueada": "…",
+    "tomarConsciencia": "…"
+  },
+  "semInversaoRelevante": false,
+  "sintese": ["…", "…", "…", "…"],
+  "escala": 2,
+  "escalaJustificacao": "…",
+  <span class="vc">// só se há uma decisão</span>
+  "veredito": {
+    "decisao": "SEGUIR COM CUIDADO",
+    "frase": "…"
+  },
+  <span class="vc">// só se o interruptor está ligado</span>
+  "debate": [
+    { "agente": "PRUMO",
+      "fala": "…", "sombra": "…" }
+    <span class="vc">// … AXIOMA, LÂMINA, TRATOR,
+    //   NEXUS, ESPELHO</span>
+  ]
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 5. PASTAS -->
+  <section aria-labelledby="h-pastas">
+    <div class="cabeca">
+      <span class="etiqueta">Onde mora cada coisa</span>
+      <h2 id="h-pastas">As pastas e o cérebro</h2>
+      <p>O cérebro é a pasta <span class="cod">skill/</span>. Para o mudar editas esses dois ficheiros e voltas a publicar. O código não precisa de ser tocado.</p>
+    </div>
+    <div class="dois">
+<pre><code>inversao/
+├─ <b>skill/</b>                      o cérebro
+│  ├─ SKILL.md
+│  └─ references/
+│     └─ sinais-de-inversao.md
+├─ src/
+│  ├─ app/
+│  │  ├─ page.tsx              Início
+│  │  ├─ resultado/            Resultado
+│  │  ├─ historico/            Histórico
+│  │  ├─ definicoes/           Definições
+│  │  └─ api/analisar/route.ts a rota
+│  └─ lib/
+│     ├─ skill.ts              lê a skill
+│     ├─ prompt.ts             monta o prompt
+│     ├─ analisar.ts           valida e repete
+│     ├─ anthropic.ts          chama o modelo
+│     ├─ schema.ts             o formato do JSON
+│     ├─ limites.ts            pedidos por IP
+│     ├─ seguranca.ts          sofrimento sério
+│     ├─ acesso.ts             contas, para depois
+│     └─ mock.ts               respostas simuladas
+├─ tests/                      33 testes
+└─ scripts/curl-testes.sh      testes com curl</code></pre>
+      <div class="cartoes" style="align-content:start">
+        <div class="cartao">
+          <h3>Como se atualiza a skill</h3>
+          <p>Edita <span class="cod">skill/SKILL.md</span> ou a referência. Em desenvolvimento vale logo, porque o servidor relê os ficheiros quando mudam. No Cloud Run a skill vai dentro da imagem, por isso basta publicar de novo.</p>
+        </div>
+        <div class="cartao">
+          <h3>Onde fica a chave</h3>
+          <p>No Secret Manager do Google Cloud, lida só no servidor. Nunca em ficheiros do projeto e nunca no browser.</p>
+        </div>
+        <div class="cartao">
+          <h3>O texto não é uma ordem</h3>
+          <p>O que a pessoa cola vai entre etiquetas e a skill trata-o como material a analisar. Se lá dentro houver "ignora as regras", é só mais texto para analisar.</p>
+        </div>
+        <div class="cartao">
+          <h3>Ideias, não pessoas</h3>
+          <p>A skill limita-se a analisar raciocínios e textos. A app diz isso nas Definições e nunca diagnostica quem escreve.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FASES -->
+  <section aria-labelledby="h-fases">
+    <div class="cabeca">
+      <span class="etiqueta">O caminho</span>
+      <h2 id="h-fases">Fases e estado</h2>
+    </div>
+    <ol class="fases">
+      <li class="fase"><span class="n">1</span><p><b>Esqueleto.</b> Next.js, TypeScript, Tailwind, os quatro ecrãs vazios, tipografia e modo claro e escuro de base.</p><span class="selo feito">Feita</span></li>
+      <li class="fase"><span class="n">2</span><p><b>Rota da API.</b> Skill como prompt, JSON validado, limites, cuidado com sofrimento sério. Testada com respostas simuladas e com curl.</p><span class="selo feito">Feita</span></li>
+      <li class="fase"><span class="n">3</span><p><b>Ligar a interface.</b> O botão Analisar chama a rota e o ecrã Resultado mostra tudo: resposta, cartão, síntese, medidor, veredito e debate.</p><span class="selo">Por fazer</span></li>
+      <li class="fase"><span class="n">4</span><p><b>Histórico, definições e PWA.</b> IndexedDB, manifest, ícones, ecrã inteiro e instalação no iPhone.</p><span class="selo">Por fazer</span></li>
+      <li class="fase"><span class="n">5</span><p><b>Polimento.</b> Cores de Verdade, Bondade e Beleza, âmbar e barro para a inversão, dourado e verde azulado para a consciência. Contraste, teclado e leitores de ecrã.</p><span class="selo">Por fazer</span></li>
+      <li class="fase"><span class="n">6</span><p><b>Deploy.</b> Dockerfile, Secret Manager, Cloud Run e domínio próprio, com cada comando gcloud explicado.</p><span class="selo">Por fazer</span></li>
+    </ol>
+  </section>
+
+  <div class="aviso">
+    <h3>O que ainda não foi testado</h3>
+    <p>Os 33 testes e as verificações com curl correram com respostas simuladas. Falta testar com o modelo real, e para isso é preciso uma chave da Anthropic. Até lá, não sabemos ao certo como o claude-sonnet-5-5 se comporta com a skill, nem quanto custa cada análise na prática.</p>
+  </div>
+
+  <footer>Este desenho reflete o código no branch <span class="cod">claude/blissful-faraday-hv5szz</span>, pasta <span class="cod">inversao/</span>. Se o código mudar, esta página tem de ser atualizada.</footer>
+</div>
