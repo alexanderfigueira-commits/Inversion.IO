@@ -169,7 +169,8 @@
     <div class="estado-geral" role="list" aria-label="Estado do projeto">
       <span class="selo feito" role="listitem">Fase 1 feita: esqueleto e ecrãs</span>
       <span class="selo feito" role="listitem">Fase 2 feita: rota da API</span>
-      <span class="selo" role="listitem">Fases 3 a 6 por fazer</span>
+      <span class="selo feito" role="listitem">Fase 3 feita: interface ligada</span>
+      <span class="selo" role="listitem">Fases 4 a 6 por fazer</span>
       <span class="selo futuro" role="listitem">Contas e Stripe: só preparado</span>
     </div>
   </header>
@@ -334,7 +335,7 @@
         <div class="tela-leg">
           <h3>Início</h3>
           <p>Onde tudo começa. A pessoa escolhe entre vocabulário do Keppe e linguagem simples, e decide se quer ver o debate.</p>
-          <span class="selo parcial">Estrutura feita, sem lógica</span>
+          <span class="selo feito">Feito (fase 3)</span>
         </div>
       </div>
 
@@ -358,7 +359,7 @@
         <div class="tela-leg">
           <h3>Resultado</h3>
           <p>A resposta direta vem primeiro. A escala de consciência é um medidor vertical de 1 a 4. O veredito só aparece quando há uma decisão em causa.</p>
-          <span class="selo">Por construir (fase 3)</span>
+          <span class="selo feito">Feito (fase 3)</span>
         </div>
       </div>
 
@@ -467,6 +468,9 @@
 │  └─ references/
 │     └─ sinais-de-inversao.md
 ├─ src/
+│  ├─ components/
+│  │  ├─ formulario-analise.tsx  o formulário
+│  │  └─ resultado-analise.tsx   o ecrã Resultado
 │  ├─ app/
 │  │  ├─ page.tsx              Início
 │  │  ├─ resultado/            Resultado
@@ -474,6 +478,9 @@
 │  │  ├─ definicoes/           Definições
 │  │  └─ api/analisar/route.ts a rota
 │  └─ lib/
+│     ├─ cliente.ts            fala com a rota
+│     ├─ estado-analise.tsx    passa a análise entre ecrãs
+│     ├─ apresentacao.ts       rótulos e textos
 │     ├─ skill.ts              lê a skill
 │     ├─ prompt.ts             monta o prompt
 │     ├─ analisar.ts           valida e repete
@@ -483,7 +490,7 @@
 │     ├─ seguranca.ts          sofrimento sério
 │     ├─ acesso.ts             contas, para depois
 │     └─ mock.ts               respostas simuladas
-├─ tests/                      33 testes
+├─ tests/                      43 testes
 └─ scripts/curl-testes.sh      testes com curl</code></pre>
       <div class="cartoes" style="align-content:start">
         <div class="cartao">
@@ -515,7 +522,7 @@
     <ol class="fases">
       <li class="fase"><span class="n">1</span><p><b>Esqueleto.</b> Next.js, TypeScript, Tailwind, os quatro ecrãs vazios, tipografia e modo claro e escuro de base.</p><span class="selo feito">Feita</span></li>
       <li class="fase"><span class="n">2</span><p><b>Rota da API.</b> Skill como prompt, JSON validado, limites, cuidado com sofrimento sério. Testada com respostas simuladas e com curl.</p><span class="selo feito">Feita</span></li>
-      <li class="fase"><span class="n">3</span><p><b>Ligar a interface.</b> O botão Analisar chama a rota e o ecrã Resultado mostra tudo: resposta, cartão, síntese, medidor, veredito e debate.</p><span class="selo">Por fazer</span></li>
+      <li class="fase"><span class="n">3</span><p><b>Ligar a interface.</b> O botão Analisar chama a rota e o ecrã Resultado mostra tudo: resposta, cartão, síntese, medidor, veredito e debate.</p><span class="selo feito">Feita</span></li>
       <li class="fase"><span class="n">4</span><p><b>Histórico, definições e PWA.</b> IndexedDB, manifest, ícones, ecrã inteiro e instalação no iPhone.</p><span class="selo">Por fazer</span></li>
       <li class="fase"><span class="n">5</span><p><b>Polimento.</b> Cores de Verdade, Bondade e Beleza, âmbar e barro para a inversão, dourado e verde azulado para a consciência. Contraste, teclado e leitores de ecrã.</p><span class="selo">Por fazer</span></li>
       <li class="fase"><span class="n">6</span><p><b>Deploy.</b> Dockerfile, Secret Manager, Cloud Run e domínio próprio, com cada comando gcloud explicado.</p><span class="selo">Por fazer</span></li>
@@ -524,7 +531,7 @@
 
   <div class="aviso">
     <h3>O que ainda não foi testado</h3>
-    <p>Os 33 testes e as verificações com curl correram com respostas simuladas. Falta testar com o modelo real, e para isso é preciso uma chave da Anthropic. Até lá, não sabemos ao certo como o claude-sonnet-5-5 se comporta com a skill, nem quanto custa cada análise na prática.</p>
+    <p>Os 43 testes, as verificações com curl e 41 verificações num browser a usar a app correram com respostas simuladas. Falta testar com o modelo real, e para isso é preciso uma chave da Anthropic. Até lá, não sabemos ao certo como o claude-sonnet-5-5 se comporta com a skill, nem quanto custa cada análise na prática.</p>
   </div>
 
   <footer>Este desenho reflete o código no branch <span class="cod">claude/blissful-faraday-hv5szz</span>, pasta <span class="cod">inversao/</span>. Se o código mudar, esta página tem de ser atualizada.</footer>
